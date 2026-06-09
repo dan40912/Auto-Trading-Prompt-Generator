@@ -1,0 +1,4 @@
+interface:
+  display_name: "Heartbeat Reporting"
+  short_description: "Write heartbeat XML trading decisions."
+  default_prompt: "Use this skill to produce heartbeat XML with NOTIFY or DONT_NOTIFY decisions."
