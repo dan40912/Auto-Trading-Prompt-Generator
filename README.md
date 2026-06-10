@@ -1,24 +1,84 @@
 # AI-Trading
 
-這個資料夾用來保存 AI Trading 相關的專案檔案、Prompt、交易自動化設定與後續開發文件。
+AI-Trading 是一套給 Codex 使用的 AI 交易 Prompt Starter 與 Skill 規格。它的目的不是直接連接真實交易帳戶，而是把交易想法、風控、授權模式、指標條件、AI Agent 分工與 Demo / Replay 測試流程整理成可複用的文件與 Codex Skill。
 
-目前專案以 README 文件與 Codex automation 設定說明為主。實際的 Codex automation 通常會存在每位使用者自己的 Codex 設定目錄中，不建議把個人本機路徑、thread id 或帳戶資訊提交到 GitHub。
+核心使用場景：
 
-## 目前檔案架構
+- 用 Starter 產生可貼到 Codex 的自動交易 Prompt。
+- 用 Skills 拆分平台安全、授權模式、行情掃描、風控、下單、止盈止損與回報格式。
+- 用 TradingView / Tradovate / TradeDay 的 Demo、Replay 或 Paper Trading 畫面測試。
+- 明確禁止在 Real / Live 未授權環境中自動點擊。
+
+## Starter 預覽
+
+Starter 是一個靜態網頁工具，會引導你選擇市場、模式、交易人格、目標、風格、指標、風控與 AI Trading Team，最後產生 Codex-ready Prompt。
+
+![AI Trading Prompt Starter](./artifacts/landing-prompt-starter.png)
+
+## 快速開始
+
+這個專案目前不需要安裝套件，可以直接打開 `index.html`。
+
+### 方法 1：直接用瀏覽器開啟
+
+```bash
+open index.html
+```
+
+### 方法 2：用本機靜態伺服器開啟
+
+```bash
+python3 -m http.server 8080
+```
+
+然後開啟：
+
+```text
+http://localhost:8080
+```
+
+## 如何使用 Starter
+
+1. 開啟 `index.html`。
+2. 選擇市場，例如 `MNQ`、`NQ`、`ES`、`MES`、`XAUUSD`、`BTC`。
+3. 選擇模式：`Read-Only`、`Demo` 或 `Live-ready`。
+4. 選擇交易人格，例如 Scalper、Day Trader、Swing Trader。
+5. 設定交易目標與風格，例如穩定獲利、最小回撤、保守或進攻。
+6. 選擇參考指標，例如 MACD、RSI、VWAP、Volume、支撐壓力。
+7. 設定風控：每日盈利目標、單筆最大止損、每日最大虧損、最低 RR、最大口數與加碼規則。
+8. 選擇 AI Trading Team，Risk Manager 預設必選。
+9. 產生 Prompt 後，貼到 Codex 中執行後續策略設計、測試或 Demo automation。
+
+## 使用前安全原則
+
+- 預設只使用 Demo、Replay 或 Paper Trading。
+- 不要把 Real / Live 帳戶當成自動點擊測試環境。
+- 若平台、帳戶類型、商品、qty、position、PnL 或 Close / Exit 控制不清楚，AI 必須等待。
+- 若無法確認成交，不得重複點擊，必須要求人工介入。
+- README 與 Skill 只保存公開安全的規格，不提交個人本機路徑、thread id、帳戶資訊或 API key。
+
+## 專案架構
 
 ```text
 AI-Trading/
-└── Readme.md
-
-建議後續加入：
+├── README.md
 ├── Example/
 │   ├── 透過Replay模式測試.png
 │   ├── 盈利部分平倉.png
 │   └── 風控平倉.png
-├── prompts/
-│   └── mnq-aggressive-auto-execute.md
-├── automations/
-│   └── mnq-aggressive-entry-15s-scan.example.toml
+├── artifacts/
+│   ├── landing-prompt-starter.png
+│   ├── risk-settings-step.png
+│   ├── indicator-selection-step.png
+│   └── ...
+├── assets/
+│   ├── css/index.css
+│   └── js/index.js
+├── index.html
+├── indicators/
+│   └── mnq-aggressive-risk-signal.js
+├── landing-page/
+│   └── trading-indicator-setup.html
 ├── skills/
 │   ├── authorization-modes/
 │   │   └── SKILL.md
@@ -36,17 +96,13 @@ AI-Trading/
 │   │   └── SKILL.md
 │   └── take-profit-stop-loss/
 │       └── SKILL.md
-├── strategies/
-│   └── mnq-aggressive-entry.md
-├── logs/
-│   └── .gitkeep
-└── docs/
-    └── risk-management.md
 ```
+
+後續若要把 Prompt、automation TOML、策略文件與交易紀錄納入版本管理，建議再加入 `prompts/`、`automations/`、`strategies/`、`logs/` 與 `docs/`。
 
 ## 專案目的
 
-本專案目前的核心目標是透過 Codex heartbeat automation，定期檢查 Codex in-app browser 中的 TradeDay/Tradovate Demo、Replay 或 Paper Trading 畫面，針對 MNQ/MNQM6 進行 aggressive auto execute scan。
+本專案的核心目標是透過 Codex Skill 與 heartbeat automation 規格，定期檢查 Codex in-app browser 中的 TradeDay / Tradovate Demo、Replay 或 Paper Trading 畫面，針對 MNQ / MNQM6 進行 aggressive auto execute scan。
 
 這個 automation 的定位不是單純觀察市場，而是在安全條件完整且交易條件成立時，可以在 Demo/Replay/Paper 環境中自動點擊下單或管理部位。
 
@@ -66,9 +122,7 @@ AI-Trading/
 
 ![風控平倉](./Example/風控平倉.png)
 
-## 如何使用
-
-### 使用流程
+## Demo / Automation 使用流程
 
 1. 開啟 Codex in-app browser。
 2. 登入 TradingView 或 Tradovate。
@@ -787,11 +841,11 @@ Stop 不應只用固定點數硬套，必須與結構失效條件一致。
 
 ## 重要注意事項
 
-1. 目前專案本身尚未包含交易程式、策略程式、測試檔或資料檔。
-2. 真實 Codex automation 設定通常存在個人本機環境中；GitHub 建議只提交範例檔與說明文件。
-3. automation 目前為 `PAUSED`，不會自動執行。
-4. 名稱與 Prompt 寫「15 秒」，但實際排程是每 15 分鐘。
-5. 此自動化只應在 Demo、Replay 或 Paper Trading 使用，不應用於 Real/Live 交易。
+1. `index.html` 是 Prompt Starter 靜態頁面，不是交易平台。
+2. `indicators/mnq-aggressive-risk-signal.js` 是指標邏輯範例，使用前需要在目標平台環境測試。
+3. 真實 Codex automation 設定通常存在個人本機環境中；GitHub 建議只提交範例檔與說明文件。
+4. automation 預設應保持保守授權，不應直接假設可操作 Real/Live。
+5. 此專案只應優先用於 Demo、Replay 或 Paper Trading，不應直接用於 Real/Live 交易。
 
 ## 後續建議的專案架構
 
@@ -799,7 +853,7 @@ Stop 不應只用固定點數硬套，必須與結構失效條件一致。
 
 ```text
 AI-Trading/
-├── Readme.md
+├── README.md
 ├── prompts/
 │   └── mnq-aggressive-auto-execute.md
 ├── automations/
@@ -809,7 +863,8 @@ AI-Trading/
 │   │   └── SKILL.md
 │   ├── heartbeat-reporting/
 │   │   └── SKILL.md
-│   ├── market-scan.md
+│   ├── market-scan/
+│   │   └── SKILL.md
 │   ├── order-execution/
 │   │   └── SKILL.md
 │   ├── platform-safety/

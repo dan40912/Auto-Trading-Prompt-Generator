@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI Trading Prompt Starter｜自動交易提示詞啟動器</title>
+  <link rel="stylesheet" href="assets/css/index.css?v=execution-policy-fix">
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <div class="hero-copy">
+        <span class="eyebrow">AI Trading Prompt Starter</span>
+        <h1>自動交易提示詞啟動器</h1>
+        <p>選擇市場、風格、參考指標、風控與 AI Agent，系統會整理成可貼到 Codex 的交易 Prompt，並產生對應的指標邏輯、顯示規格與測試要求。</p>
+        <div class="hero-actions">
+          <a class="button primary" href="#starter" title="依照你的選項產生 Codex Prompt 與指標規格">開始建立 Prompt</a>
+          <a class="button ghost" href="#starter-output" title="查看這個 Starter 會幫你整理哪些輸出">查看會產生什麼</a>
+        </div>
+        <div class="hero-proof" aria-label="Starter 輸出重點">
+          <span>Codex-ready Prompt</span>
+          <span>指標規格</span>
+          <span>風控規則</span>
+          <span>Agent Debate</span>
+        </div>
+      </div>
+      <aside class="team-preview prompt-preview-card" aria-label="自動交易提示詞輸出預覽">
+        <div class="preview-header">
+          <strong>Prompt Output</strong>
+          <span>給 Codex 使用</span>
+        </div>
+        <div class="mini-agent risk">交易 Prompt<span>角色、流程、限制與輸出格式</span></div>
+        <div class="mini-agent">指標邏輯<span>Buy / Sell / Watch / Risk 狀態</span></div>
+        <div class="mini-agent">風控規格<span>止損、盈利目標、RR、口數限制</span></div>
+        <div class="mini-agent">測試清單<span>Replay、Demo、Paper Trading 驗證</span></div>
+      </aside>
+    </section>
+
+    <section class="starter-output" id="starter-output">
+      <div class="section-heading">
+        <span class="eyebrow">What This Builds</span>
+        <h2>不是交易平台，是給 Codex 的自動交易開發起點</h2>
+        <p>你不需要先會寫 Prompt，也不需要先整理一長串需求。這個 Starter 會把你的選擇轉成結構化規格，讓 Codex 可以接著幫你設計、撰寫與測試。</p>
+      </div>
+      <div class="output-grid">
+        <article>
+          <strong>1. 自動交易 Prompt</strong>
+          <span>定義 AI 交易團隊、決策流程、禁止事項、輸出格式與安全邊界。</span>
+        </article>
+        <article>
+          <strong>2. 指標規格</strong>
+          <span>整理畫面要顯示的買賣提示、觀察狀態、止盈止損、信心與理由。</span>
+        </article>
+        <article>
+          <strong>3. 風控設定</strong>
+          <span>把盈利目標、單筆止損、每日風險、最低盈虧比與最大口數寫清楚。</span>
+        </article>
+        <article>
+          <strong>4. 測試計畫</strong>
+          <span>要求 Codex 優先用 Replay、Demo 或 Paper Trading 驗證，不直接假設真實交易授權。</span>
+        </article>
+      </div>
+    </section>
+
+    <section class="how">
+      <h2>使用方式</h2>
+      <div class="how-grid">
+        <div><b>1</b><span>選擇市場</span></div>
+        <div><b>2</b><span>選擇使用模式</span></div>
+        <div><b>3</b><span>選擇交易人格</span></div>
+        <div><b>4</b><span>設定目標與風格</span></div>
+        <div><b>5</b><span>選擇參考指標</span></div>
+        <div><b>6</b><span>設定風控邊界</span></div>
+        <div><b>7</b><span>建立 AI Agent 團隊</span></div>
+        <div><b>8</b><span>產生 Prompt 與指標規格</span></div>
+      </div>
+    </section>
+
+    <section class="starter" id="starter">
+      <div class="wizard">
+        <header class="wizard-head">
+          <div>
+            <span id="stepBadge">Step 1 / 8</span>
+            <h2 id="stepTitle">選擇市場</h2>
+            <p id="stepHint">選擇你想要 Replay、Demo 或 Paper Trading 測試的市場。</p>
+          </div>
+          <div class="progress"><span id="progressBar"></span></div>
+        </header>
+
+        <div class="step-panel active" data-step="0">
+          <div class="choice-grid" id="marketChoices"></div>
+        </div>
+
+        <div class="step-panel" data-step="1">
+          <div class="choice-grid mode-grid" id="modeChoices"></div>
+        </div>
+
+        <div class="step-panel" data-step="2">
+          <div class="choice-grid" id="personalityChoices"></div>
+        </div>
+
+        <div class="step-panel" data-step="3">
+          <div class="choice-grid" id="goalChoices"></div>
+        </div>
+
+        <div class="step-panel" data-step="4">
+          <div class="choice-grid" id="styleChoices"></div>
+        </div>
+
+        <div class="step-panel" data-step="5">
+          <div class="indicator-builder">
+            <div class="team-builder-head">
+              <div>
+                <span class="eyebrow">Step 6</span>
+                <h3>選擇重要參考指標</h3>
+                <p>選擇你希望 AI 參考的指標。這些指標只做輔助判斷，不會單獨決定 Buy / Sell。</p>
+              </div>
+              <span id="indicatorCount">0 個已選</span>
+            </div>
+
+            <div class="indicator-grid" id="indicatorChoices"></div>
+          </div>
+        </div>
+
+        <div class="step-panel" data-step="6">
+          <div class="risk-builder">
+            <div class="team-builder-head">
+              <div>
+                <span class="eyebrow">Step 7</span>
+                <h3>設定盈利目標、止損與風控</h3>
+                <p>這些限制會寫進 Prompt，讓 Risk Manager 先檢查風險，再讓其他 Agent 參與討論。</p>
+              </div>
+              <span>風控優先</span>
+            </div>
+
+            <div class="risk-grid">
+              <label class="risk-field">
+                <span>每日盈利目標</span>
+                <input id="profitTargetInput" type="number" min="0" step="50" value="300" title="設定每日想達到的獲利目標。達標後 AI 會偏向停止開新倉，只做回顧或管理既有部位。">
+                <small>例：300。達標後偏向停止新交易，避免把盈利吐回去。</small>
+              </label>
+
+              <label class="risk-field">
+                <span>單筆最大止損</span>
+                <input id="stopLossInput" type="number" min="1" step="10" value="100" title="設定單筆交易可承受的最大虧損。若潛在止損超過此值，Risk Manager 必須阻擋。">
+                <small>例：100。任何 setup 超過這個止損上限都不應放行。</small>
+              </label>
+
+              <label class="risk-field">
+                <span>每日最大虧損</span>
+                <input id="dailyLossInput" type="number" min="1" step="50" value="300" title="設定每日最大虧損上限。達到後 AI 必須停止尋找新交易。">
+                <small>例：300。達到日損上限後，只允許等待、回顧或停止。</small>
+              </label>
+
+              <label class="risk-field">
+                <span>最低盈虧比</span>
+                <input id="minimumRRInput" type="number" min="0.5" step="0.1" value="1.5" title="設定最低 Reward/Risk。低於此數字的交易不能進入最終決策。">
+                <small>例：1.5。代表預期獲利至少要是風險的 1.5 倍。</small>
+              </label>
+
+              <label class="risk-field">
+                <span>最大口數</span>
+                <input id="maxContractsInput" type="number" min="1" step="1" value="1" title="設定最多允許幾口合約。AI 不可以自行提高口數。">
+                <small>例：1。避免 AI 在沒有授權下加大槓桿。</small>
+              </label>
+
+              <label class="risk-field">
+                <span>加碼規則</span>
+                <select id="addOnRuleInput" title="設定是否允許加碼。保守建議先不允許加碼，等 Demo 驗證後再開啟。">
+                  <option value="不允許加碼">不允許加碼</option>
+                  <option value="只允許盈利後加碼">只允許盈利後加碼</option>
+                  <option value="需要人工確認後加碼">需要人工確認後加碼</option>
+                </select>
+                <small>保守預設：不允許加碼。先讓策略乾淨、容易回測。</small>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-panel" data-step="7">
+          <div class="team-builder" id="agents">
+            <div class="team-builder-head">
+              <div>
+                <span class="eyebrow">Step 8</span>
+                <h3>建立你的 AI Trading Team</h3>
+                <p>先用快速組合決定團隊骨架，再微調核心與專家 Agent。Risk Manager 預設必選。</p>
+              </div>
+              <span id="agentCount">0 位已選</span>
+            </div>
+
+            <section class="team-section">
+              <div class="section-label">
+                <strong>快速組合</strong>
+                <span>選一種常見團隊配置，之後仍可手動調整。</span>
+              </div>
+              <div class="preset-row" id="presetChoices"></div>
+            </section>
+
+            <div class="team-layout">
+              <div class="team-selectors">
+                <section class="team-section">
+                  <div class="section-label">
+                    <strong>核心團隊</strong>
+                    <span>負責方向、進場、結構與風控。</span>
+                  </div>
+                  <div class="agent-grid compact" id="coreAgentChoices"></div>
+                </section>
+
+                <section class="team-section">
+                  <div class="section-label">
+                    <strong>專家團隊</strong>
+                    <span>補強關鍵位、流動性、成交量、新聞與宏觀背景。</span>
+                  </div>
+                  <div class="agent-grid compact" id="specialistAgentChoices"></div>
+                </section>
+              </div>
+
+              <aside class="team-builder-preview" aria-label="AI Trading Team 預覽">
+                <section class="team-section">
+                  <div class="section-label">
+                    <strong>團隊預覽</strong>
+                    <span>依照目前選擇即時估算。</span>
+                  </div>
+                  <div class="metric-grid">
+                    <div><b id="coreCount">4</b><span>Core Agent</span></div>
+                    <div><b id="specialistCount">3</b><span>Specialist Agent</span></div>
+                  </div>
+                  <div class="team-estimate">
+                    <span>預估 Prompt</span>
+                    <strong id="tokenEstimate">3200 Tokens</strong>
+                  </div>
+                  <div class="team-estimate">
+                    <span>預估決策品質</span>
+                    <strong id="qualityEstimate">★★★★☆</strong>
+                  </div>
+                </section>
+
+                <section class="team-section debate-preview-box">
+                  <div class="section-label">
+                    <strong>Agent Debate Preview</strong>
+                    <span>範例顯示 Agent 不會全部同意。</span>
+                  </div>
+                  <div class="debate-mini" id="teamDebatePreview"></div>
+                  <div class="final-vote" id="teamFinalVote">LONG Approved</div>
+                </section>
+              </aside>
+            </div>
+          </div>
+        </div>
+
+        <footer class="wizard-actions">
+          <button class="button ghost" id="backBtn" type="button" title="回到上一個設定步驟">上一步</button>
+          <button class="button primary" id="nextBtn" type="button" title="前往下一步，完成後會產生 Codex Prompt">下一步</button>
+        </footer>
+      </div>
+
+      <aside class="starter-summary">
+        <h3>目前 Starter</h3>
+        <dl>
+          <div><dt>市場</dt><dd id="summaryMarket">尚未選擇</dd></div>
+          <div><dt>模式</dt><dd id="summaryMode">尚未選擇</dd></div>
+          <div><dt>人格</dt><dd id="summaryPersonality">尚未選擇</dd></div>
+          <div><dt>目標</dt><dd id="summaryGoal">尚未選擇</dd></div>
+          <div><dt>風格</dt><dd id="summaryStyle">尚未選擇</dd></div>
+          <div><dt>參考指標</dt><dd id="summaryIndicators">尚未選擇</dd></div>
+          <div><dt>盈利目標</dt><dd id="summaryProfitTarget">300</dd></div>
+          <div><dt>單筆止損</dt><dd id="summaryStopLoss">100</dd></div>
+          <div><dt>每日風控</dt><dd id="summaryDailyRisk">300</dd></div>
+          <div><dt>Agent</dt><dd id="summaryAgents">尚未完成</dd></div>
+        </dl>
+        <div class="readiness" id="readiness">完成 8 個步驟後，會顯示策略預覽與 Prompt。</div>
+      </aside>
+    </section>
+
+    <section class="results is-hidden" id="results">
+      <div class="result-head">
+        <div>
+          <span class="eyebrow">Prompt Ready</span>
+          <h2>你的 AI 交易團隊已建立</h2>
+          <p>先查看摘要與 Agent 辯論邏輯，再展開完整 Prompt 複製到 Codex。</p>
+        </div>
+        <div class="result-actions">
+          <button class="button ghost" id="togglePromptBtn" type="button" title="展開或收合完整 Codex Prompt">展開 Prompt</button>
+          <button class="button primary" id="copyPromptBtn" type="button" title="複製完整 Prompt，方便貼到 Codex">複製 Prompt</button>
+          <button class="button ghost" id="downloadPromptBtn" type="button" title="把 Prompt 下載成 Markdown 檔案保存">下載 Markdown</button>
+        </div>
+      </div>
+
+      <section class="visual-preview-card" aria-label="指標視覺預覽">
+        <div class="visual-preview-head">
+          <strong>視覺預覽</strong>
+          <span>買進/賣出大字；觀察小提醒；關鍵線只顯示附近價位</span>
+        </div>
+        <div class="chart-preview">
+          <div class="chart-toolbar">
+            <span class="tag buy">買進</span>
+            <span class="tag sell">賣出</span>
+            <span class="tag tp">止盈</span>
+            <span class="tag sl">止損</span>
+            <span class="tag watch">出場 / 觀察</span>
+            <span class="tag day">今日高低</span>
+            <span class="tag prev">前日高低</span>
+            <span class="tag range">開盤區間</span>
+          </div>
+          <div class="chart-stage">
+            <div class="price-line line-blue line-top"><span>今日高</span></div>
+            <div class="price-line line-white line-orl"><span>開盤低</span></div>
+            <div class="price-line line-purple line-pdh"><span>前日高</span></div>
+            <div class="price-line line-green line-vwap"><span>VWAP</span></div>
+            <div class="price-line line-amber line-support"><span>30分支撐</span></div>
+            <div class="price-line line-amber line-pressure"><span>30分壓力</span></div>
+            <div class="price-line line-purple line-pdl"><span>前日低</span></div>
+            <div class="price-line line-white line-orh"><span>開盤高</span></div>
+            <div class="price-line line-blue line-low"><span>今日低</span></div>
+            <div class="signal-label buy-signal">買進 84% RR 1.3</div>
+            <div class="signal-label watch-signal">觀察壓力</div>
+            <div class="signal-label exit-signal">出多 | VWAP</div>
+            <div class="tp-line"><span>止盈</span></div>
+            <div class="sl-line"><span>止損</span></div>
+            <div class="candles" aria-hidden="true">
+              <i></i><i></i><i class="red"></i><i class="red"></i><i class="red"></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="red"></i><i class="red"></i><i class="red"></i><i></i><i></i><i></i><i></i><i class="red"></i><i></i>
+            </div>
+            <div class="price-path"></div>
+          </div>
+        </div>
+      </section>
+
+      <div class="result-grid">
+        <section class="card">
+          <h3>策略摘要</h3>
+          <div class="summary-list" id="strategySummary"></div>
+        </section>
+
+        <section class="card">
+          <h3>AI Agent 團隊</h3>
+          <div class="selected-agents" id="selectedAgents"></div>
+        </section>
+
+        <section class="card">
+          <h3>Agent 辯論流程</h3>
+          <div class="debate-flow" id="debateFlow"></div>
+        </section>
+
+        <section class="card decision-preview">
+          <h3>AI 決策狀態預覽</h3>
+          <div class="decision-state">
+            <strong>等待確認</strong>
+            <span>Risk Manager 會先檢查風險，Agent 不會全部無條件同意。</span>
+          </div>
+          <div class="state-row">
+            <span>AI 建議買進</span>
+            <span>AI 建議賣出</span>
+            <span>觀察中</span>
+            <span>風險過高</span>
+            <span>不建議交易</span>
+          </div>
+        </section>
+      </div>
+
+      <section class="prompt-panel is-collapsed" id="promptPanel">
+        <div class="prompt-head">
+          <h3>Codex Prompt 預覽</h3>
+          <span>可直接複製貼到 Codex，開始 Replay / Demo / Paper Trading 測試。</span>
+        </div>
+        <textarea id="promptOutput" spellcheck="false"></textarea>
+      </section>
+    </section>
+  </main>
+
+  <script src="assets/js/index.js?v=execution-policy-fix"></script>
+</body>
+</html>
