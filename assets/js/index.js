@@ -6,17 +6,17 @@ const steps = [
   },
   {
     title: "選擇使用模式",
-    hint: "決定 AI 只能讀取、可以在模擬環境操作，或是否允許進入 Live 規格。Live 必須保留人工確認。",
+    hint: "決定只能讀取、可以在模擬環境操作，或是否允許進入 Live 規格。Live 必須保留人工確認。",
     key: "mode"
   },
   {
     title: "選擇交易人格",
-    hint: "這會決定 AI 團隊偏向快進快出、日內交易或較長週期觀察。",
+    hint: "這會決定角色團隊偏向快進快出、日內交易或較長週期觀察。",
     key: "personality"
   },
   {
     title: "選擇目標",
-    hint: "告訴 AI 團隊你最重視勝率、穩定、收益、回撤或進場速度。",
+    hint: "告訴角色團隊你最重視勝率、穩定、收益、回撤或進場速度。",
     key: "goal"
   },
   {
@@ -26,7 +26,7 @@ const steps = [
   },
   {
     title: "選擇重要參考指標",
-    hint: "選擇 AI 需要參考的指標。它們只做輔助確認，不會單獨決定買賣。",
+    hint: "選擇需要參考的指標。它們只做輔助確認，不會單獨決定買賣。",
     key: "indicators"
   },
   {
@@ -35,8 +35,8 @@ const steps = [
     key: "risk"
   },
   {
-    title: "建立你的 AI Trading Team",
-    hint: "用快速組合建立團隊，再微調核心與專家 Agent。Risk Manager 擁有否決權。",
+    title: "建立你的交易角色團隊",
+    hint: "用快速組合建立團隊，再微調核心與專家角色。Risk Manager 擁有否決權。",
     key: "agents"
   }
 ];
@@ -53,7 +53,7 @@ const options = {
     ["Forex", "外匯市場，適合宏觀與趨勢觀察。"]
   ],
   mode: [
-    ["Read-Only", "只允許觀察、分析、產生建議與 Prompt。不得點擊 Buy、Sell、Close、Exit 或修改訂單。適合研究、回顧與策略設計。"],
+    ["Read-Only", "只允許觀察、分析與產生建議。不得點擊 Buy、Sell、Close、Exit 或修改訂單。適合研究、回顧與策略設計。"],
     ["Demo", "允許在 Demo、Replay 或 Paper Trading 環境中測試流程。任何下單或出場動作都必須先描述下一步，且不得假設真實帳戶授權。"],
     ["Live", "最高風險模式。只產生 Live-ready 規格，不代表直接授權自動交易；每次買賣、加碼、減倉、平倉都必須要求人工確認。"]
   ],
@@ -86,7 +86,7 @@ const agents = [
     shortName: "Risk Manager",
     role: "風控主管",
     duty: "擁有否決權，阻擋 RR 不足、過度交易與高風險環境。",
-    why: "每個 AI 交易團隊都需要一位能說不的 Agent。",
+    why: "每個交易角色團隊都需要一位能說不的風控主管。",
     group: "core",
     selected: true,
     locked: true
@@ -164,7 +164,7 @@ const agents = [
     shortName: "News",
     role: "新聞風險官",
     duty: "提醒 CPI、FOMC、NFP、央行談話等事件風險。",
-    why: "避免在高衝擊新聞前後讓 AI 亂交易。",
+    why: "避免在高衝擊新聞前後做出高風險交易。",
     group: "specialist",
     selected: false
   },
@@ -293,9 +293,9 @@ const validationMessages = {
   personality: "請先選擇交易人格，再進入下一步。",
   goal: "請先選擇交易目標，再進入下一步。",
   style: "請先選擇交易風格，再進入指標選擇。",
-  indicators: "請至少選擇 1 個參考指標，讓 Codex 能產生指標規格。",
+  indicators: "請至少選擇 1 個參考指標，讓設定檔能產生畫面提示規格。",
   risk: "請確認風控設定：止損與每日最大虧損必須大於 0，最低盈虧比至少 0.5，最大口數必須是 1 以上的整數。",
-  agents: "請至少選擇 3 位 Agent，並保留 Risk Manager。"
+  agents: "請至少選擇 3 位交易角色，並保留 Risk Manager。"
 };
 
 function init() {
@@ -426,8 +426,8 @@ function bindEvents() {
   $("togglePromptBtn").addEventListener("click", () => {
     $("promptPanel").classList.toggle("is-collapsed");
     $("togglePromptBtn").textContent = $("promptPanel").classList.contains("is-collapsed")
-      ? "展開 Prompt"
-      : "收合 Prompt";
+      ? "展開設定檔"
+      : "收合設定檔";
   });
 
   $("copyPromptBtn").addEventListener("click", async () => {
@@ -447,7 +447,7 @@ function bindEvents() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = "ai-trading-starter-prompt.md";
+    link.download = "trading-starter-settings.md";
     link.click();
     URL.revokeObjectURL(url);
   });
@@ -487,7 +487,7 @@ function goToStep(nextStep) {
 function markDirty() {
   if (!$("results").classList.contains("is-hidden")) {
     $("results").classList.add("is-hidden");
-    $("readiness").textContent = "設定已更新，請重新產生 Prompt。";
+    $("readiness").textContent = "設定已更新，請重新產生設定檔。";
   }
 }
 
@@ -525,7 +525,7 @@ function updateWizard() {
     panel.classList.toggle("active", Number(panel.dataset.step) === state.step);
   });
   $("backBtn").disabled = state.step === 0;
-  $("nextBtn").textContent = state.step === steps.length - 1 ? "產生 Prompt" : "下一步";
+  $("nextBtn").textContent = state.step === steps.length - 1 ? "產生設定檔" : "下一步";
   if (steps[state.step].key === "risk") markRiskValidity();
 }
 
@@ -573,8 +573,8 @@ function updateSummary() {
   $("summaryDailyRisk").textContent = `${formatMoneyLike(state.risk.dailyLoss)} / RR ${formatRiskNumber(state.risk.minimumRR)}`;
   $("summaryAgents").textContent = `${selectedAgents().length} 位已選`;
   $("readiness").textContent = isReady()
-    ? "已完成 Starter。可以產生 AI Trading Prompt。"
-    : "完成 8 個步驟後，會顯示策略預覽與 Prompt。";
+    ? "設定已完成，可以產生交易設定檔。"
+    : "完成 8 個步驟後，會顯示策略預覽與交易設定檔。";
 }
 
 function updateIndicatorCount() {
@@ -592,7 +592,7 @@ function updateTeamPreview() {
   const qualityScore = Math.min(5, Math.max(2, Math.round((core * 0.7) + (specialists * 0.45))));
   $("coreCount").textContent = core;
   $("specialistCount").textContent = specialists;
-  $("tokenEstimate").textContent = `${tokenEstimate} Tokens`;
+  $("tokenEstimate").textContent = `約 ${tokenEstimate.toLocaleString()} 字`;
   $("qualityEstimate").textContent = `${"★".repeat(qualityScore)}${"☆".repeat(5 - qualityScore)}`;
   $("teamDebatePreview").innerHTML = buildTeamDebatePreview().map(item => `
     <div>
@@ -600,17 +600,17 @@ function updateTeamPreview() {
       <strong class="${item.tone}">${item.vote}</strong>
     </div>
   `).join("");
-  $("teamFinalVote").textContent = specialists >= 2 && core >= 4 ? "LONG Approved" : "WAIT";
+  $("teamFinalVote").textContent = specialists >= 2 && core >= 4 ? "偏多通過" : "等待確認";
   updateAgentCount();
 }
 
 function buildTeamDebatePreview() {
   const selectedIds = new Set(selectedAgents().map(agent => agent.id));
   const items = [
-    { agent: "1m Trader", vote: selectedIds.has("oneMinute") ? "Buy" : "Wait", tone: "agree" },
-    { agent: "Risk Manager", vote: "Reject", tone: "reject" },
-    { agent: "Volume", vote: selectedIds.has("volume") ? "Agree" : "No Data", tone: selectedIds.has("volume") ? "agree" : "neutral" },
-    { agent: "Trend", vote: selectedIds.has("oneHour") ? "Agree" : "No Bias", tone: selectedIds.has("oneHour") ? "agree" : "neutral" }
+    { agent: "1m Trader", vote: selectedIds.has("oneMinute") ? "偏多" : "等待", tone: "agree" },
+    { agent: "Risk Manager", vote: "否決", tone: "reject" },
+    { agent: "Volume", vote: selectedIds.has("volume") ? "同意" : "資料不足", tone: selectedIds.has("volume") ? "agree" : "neutral" },
+    { agent: "Trend", vote: selectedIds.has("oneHour") ? "同意" : "方向不足", tone: selectedIds.has("oneHour") ? "agree" : "neutral" }
   ];
   return items;
 }
@@ -662,7 +662,7 @@ function formatRiskNumber(value) {
 
 function showResults() {
   if (!isReady()) {
-    $("readiness").textContent = "請先完成市場、使用模式、人格、目標、風格、參考指標、風控設定，並至少選擇 3 位 Agent。";
+    $("readiness").textContent = "請先完成市場、使用模式、人格、目標、風格、參考指標、風控設定，並至少選擇 3 位交易角色。";
     return;
   }
   renderResults();
@@ -724,9 +724,10 @@ function buildPrompt() {
   const indicatorText = selectedIndicators().map(indicator => `- ${indicator.name}（${indicator.role}）：${indicator.hint}`).join("\n");
   const modeRules = buildModeRules();
   const executionPolicy = buildExecutionPolicy();
-  return `# AI Trading Prompt Starter
+  const emergencyPolicy = buildEmergencyPolicy();
+  return `# 交易自動化設定檔
 
-你是我的 AI Trading Team Coordinator 與交易指標規格設計師。請用保守、清楚、風控優先的方式，根據以下選項產生可交給 Codex 實作的自動交易提示詞、指標規格與測試計畫。
+你是我的交易流程協調者與畫面提示規格設計師。請用清楚、果斷、風控優先的方式，根據以下選項產生自動化交易設定檔、畫面提示規格與測試計畫。Demo / Replay 的目標是有效測試策略，不要因為輔助資訊不完整而永遠不交易；但超出風控時必須先處理風險。
 
 ## 使用者設定
 - 市場：${state.market}
@@ -792,36 +793,39 @@ ${modeRules}
 ## Demo / Replay 執行政策
 ${executionPolicy}
 
-## AI Agent 團隊
+## Emergency Risk Mode
+${emergencyPolicy}
+
+## 交易角色團隊
 ${agentText}
 
 ## 參考指標
 ${indicatorText}
 
 ## 請產生的內容
-1. Codex-ready 自動交易 Prompt：包含角色、限制、流程、輸出格式與安全規則。
-2. 指標規格：說明畫面要如何顯示 AI 建議買進、AI 建議賣出、觀察中、等待確認、風險過高與不建議交易。
-3. 訊號邏輯：描述什麼情況可以提出 Buy / Sell / Watch，但 Agent 不可直接下單。
+1. 交易設定檔：包含角色、限制、流程、輸出格式與安全規則。
+2. 畫面提示規格：說明畫面要如何顯示建議買進、建議賣出、觀察中、等待確認、風險過高與不建議交易。
+3. 訊號邏輯：描述什麼情況可以提出 Buy / Sell / Watch，但交易角色不可直接下單。
 4. 風控與出場規格：包含止損、盈利目標、最低盈虧比、最大口數與加碼規則。
-5. 測試計畫：優先使用 Replay / Demo / Paper Trading，驗證 Prompt 與指標是否一致。
+5. 測試計畫：優先使用 Replay / Demo / Paper Trading，驗證設定檔與畫面提示是否一致。
 
 ## 指標顯示需求
 1. 指標應該用新手看得懂的文字顯示，不要一開始要求使用者理解複雜技術名詞。
-2. 圖上可顯示：AI 建議買進、AI 建議賣出、觀察中、等待確認、風險過高、不建議交易。
+2. 圖上可顯示：建議買進、建議賣出、觀察中、等待確認、風險過高、不建議交易。
 3. 若有正式訊號，必須同時顯示進場理由、止損位置、盈利目標、最低盈虧比與風險提醒。
 4. 若條件不足，應優先顯示等待或觀察，不要過度產生訊號。
 5. 指標只做決策輔助，不代表真實帳戶自動下單授權。
 6. 參考指標只能作為證據來源。不得因 MACD、RSI、VWAP、KDJ 或任何單一指標出現訊號，就直接輸出買進或賣出。
-7. 若多個指標互相衝突，請降低信心並要求 Agent Debate 說明分歧。
+7. 若多個指標互相衝突，請降低信心並要求交易角色說明分歧。
 
-## Agent 工作規則
-1. Agent 只能提供觀察、支持理由、反對理由、最大風險、關鍵價位與失效條件。
-2. Agent 不允許直接輸出「立刻買進」或「立刻賣出」。
-3. Risk Manager 擁有否決權。若硬阻擋條件成立、RR 不足、風險過高、接近重大新聞或核心安全資訊不清楚，必須阻擋交易。
-4. 至少三位 Agent 必須提出反方觀點或風險提醒，避免所有 Agent 無條件同意。
+## 交易角色工作規則
+1. 交易角色只能提供觀察、支持理由、反對理由、最大風險、關鍵價位與失效條件。
+2. 交易角色不允許直接輸出「立刻買進」或「立刻賣出」。
+3. Risk Manager 擁有否決權。若硬阻擋條件成立、RR 不足、風險過高、接近重大新聞或核心安全資訊不清楚，必須阻擋新進場；若已進入 Emergency Risk Mode，Risk Manager 可以要求出場、減倉或取消不匹配掛單。
+4. 至少三位交易角色必須提出反方觀點或風險提醒，避免所有角色無條件同意。
 5. 只有 Decision Engine 可以輸出最終狀態：買進、賣出、等待、持有、減倉、出場。
 
-## 風控規則
+## 風險邊界
 1. 若單筆預估止損超過 ${formatMoneyLike(state.risk.stopLoss)}，Risk Manager 必須阻擋。
 2. 若當日虧損接近或達到 ${formatMoneyLike(state.risk.dailyLoss)}，停止尋找新交易。
 3. 若當日盈利達到 ${formatMoneyLike(state.risk.profitTarget)}，停止主動開新倉，優先回顧與保護獲利。
@@ -829,22 +833,63 @@ ${indicatorText}
 5. 最大口數不得超過 ${state.risk.maxContracts}。
 6. 加碼規則：${state.risk.addOnRule}。
 
-## AI 操控電腦規則
+## 電腦操作規則
 1. 每次準備操作畫面前，先用一句話通知目前觀察與下一步。
 2. 若帳戶模式、商品、qty、Buy/Sell/Close/Exit 按鈕不可見，停止操作並要求人工確認。
 3. 若看到 Real / Live / 真實帳戶，立即停止，不點擊任何交易按鈕。
 4. 每輪最多一個動作。成交狀態不明時，不重複點擊。
-5. 若 Agent 衝突、風險過高、接近重大新聞或交易理由不足，請輸出「等待」。
+5. 若角色觀點衝突、風險過高、接近重大新聞或交易理由不足，禁止新進場；若已有持倉且觸發 Emergency Risk Mode，優先處理風險，不要只輸出等待。
 6. 必須遵守使用模式規則；若平台畫面與所選模式不一致，立即停止並要求人工確認。
 
-## 輸出格式
-- 狀態：安全 / 等待 / 需要確認 / 阻擋
-- 市場觀察：簡短描述目前行情
-- Agent 分歧：列出支持與反對
-- 候選 Setup：direction、entry、stop、take_profit、RR、setup_score、confidence、失效條件
-- 風險：硬阻擋、軟降分、關鍵位、新聞或資訊不明
-- 最終建議：買進 / 賣出 / 等待 / 出場
-- 下一步：繼續觀察、要求確認或只管理既有部位
+## 輸出精簡規則
+1. 每輪輸出必須短、固定、可掃描；不要寫長段落。
+2. 不要重複系統規則、風控全文、角色職責或使用者設定。
+3. 只列出「會影響這一輪決策」的資訊。
+4. 不可見資訊只列在「扣分」欄，最多 3 項；不要每輪長篇列出所有不可見指標。
+5. 角色分歧只保留最重要的 2 個支持點與 2 個反對點。
+6. 若沒有硬阻擋，請寫「硬阻擋：無」，不要把可確認的安全項目全部列出。
+7. 若 setup_score 或 confidence 未達標，直接寫差多少，例如「score 70/72、conf 58/68」。
+8. 普通等待用 DONT_NOTIFY；只有實際點擊、成交不明、部位衝突、Real/Live 風險、需要人工立即處理時才用 NOTIFY。
+9. 不要輸出 JSON。若需要 heartbeat，使用簡短 XML。
+10. 最終給使用者看的 feedback 必須用「Agent 分析 / 綜合評比 / 理由」格式，不要再輸出長段市場觀察。
+11. 勝率若沒有歷史統計資料，請寫「估計勝率」或「勝率資料不足」，不得假裝有真實回測勝率。
+
+## 每輪輸出格式
+請使用以下格式，不要增加其他段落。message 內只放交易回饋卡：
+
+<heartbeat>
+  <DONT_NOTIFY/>
+  <message>
+Agent 分析：等待｜估計勝率 60%
+Agent 分析：進場｜估計勝率 80%
+綜合評比：勇敢進場，獲取利潤 / 等待確認 / 風險過高不進場
+理由：一句話說明最主要原因，例如「目前抵達設定點位，RR 達標，風控未觸發硬阻擋。」
+  </message>
+</heartbeat>
+
+若需要人工立即介入，改用：
+
+<heartbeat>
+  <NOTIFY/>
+  <message>
+Agent 分析：等待｜勝率資料不足
+Agent 分析：進場｜不允許
+綜合評比：需要人工確認，暫不進場 / 緊急風控處理
+理由：一句話說明需要人工介入的硬阻擋，例如「帳戶模式無法確認」；若是 Demo / Replay 且已觸發 Emergency Risk Mode，請改寫為「已超出風控，優先 Exit / Reduce / Cancel 不匹配掛單。」
+  </message>
+</heartbeat>
+
+若真的執行 Demo/Paper 點擊，改用：
+
+<heartbeat>
+  <NOTIFY/>
+  <message>
+Agent 分析：等待｜估計勝率 低於進場方案
+Agent 分析：進場｜估計勝率 80%
+綜合評比：已執行 Demo/Paper 進場 / 已執行緊急風控處理
+理由：動作=Buy/Sell/Close/Exit/Cancel/Reduce + 商品 + qty；entry=，SL=，TP=，RR=；成交檢查=成交/未成交/不明。
+  </message>
+</heartbeat>
 
 請保持語氣溫和、具體、可執行，不要誇大勝率，也不要把任何建議當成真實帳戶自動交易授權。`;
 }
@@ -858,7 +903,7 @@ function modeExecutionScope() {
 
 function buildModeRules() {
   if (state.mode === "Read-Only") {
-    return `1. 只能讀取畫面、整理觀察、產生 Prompt、指標規格與測試建議。
+    return `1. 只能讀取畫面、整理觀察、產生交易設定檔、畫面提示規格與測試建議。
 2. 禁止點擊 Buy、Sell、Close、Exit、Cancel、Replace 或任何會改變訂單/部位的按鈕。
 3. 禁止修改 qty、價格、停損、止盈或帳戶設定。
 4. 適合策略研究、回顧、Replay 分析與開發前規格整理。`;
@@ -867,10 +912,10 @@ function buildModeRules() {
     return `1. 只允許在 Demo、Replay 或 Paper Trading 環境中測試。
 2. 每次操作前必須先說明觀察、理由、風險與下一步。
 3. 若畫面顯示 Real、Live、真實帳戶或帳戶模式不明，立即停止。
-4. 可用於驗證 Prompt、指標顯示、風控流程與 Agent Debate 是否一致。`;
+4. 可用於驗證設定檔、畫面提示、風控流程與角色分歧是否一致。`;
   }
   if (state.mode === "Live") {
-    return `1. Live 是最高風險模式；此 Prompt 只產生 Live-ready 規格，不構成自動交易授權。
+    return `1. Live 是最高風險模式；此設定檔只產生 Live-ready 規格，不構成自動交易授權。
 2. 每一次買進、賣出、加碼、減倉、平倉、取消或修改訂單，都必須要求人工確認。
 3. 若無法清楚辨識帳戶、商品、口數、部位、PnL、停損與止盈，立即停止。
 4. Risk Manager 擁有最高否決權；任何風控、新聞、衝突或資訊不明，都必須輸出等待。`;
@@ -885,12 +930,13 @@ function buildExecutionPolicy() {
 3. 不得點擊任何交易、訂單或部位管理按鈕。`;
   }
   if (state.mode === "Demo") {
-    return `1. 若畫面明確是 Demo / Replay / Paper，且沒有硬阻擋，允許進入 Demo 測試判斷。
+    return `1. 若畫面明確是 Demo / Replay / Paper，允許進入 Demo 測試判斷；請先判斷目前是 New Entry Mode 還是 Emergency Risk Mode。
 2. daily PnL 不可見時，不要直接阻擋候選 setup；請標註 daily PnL 不可見，並把 confidence 降低。
 3. 若 daily PnL 不可見但其他核心安全條件完整，可以在 Demo / Replay / Paper 中用「daily PnL 未知，按 0 暫估」產生候選；實際點擊前仍需確認沒有達到日損/日利限制。
 4. 輔助指標不可見只降分，不是硬阻擋。
-5. 只有當候選 setup_score >= 72、confidence >= 68、RR >= ${state.risk.minimumRR}、stop <= ${formatMoneyLike(state.risk.stopLoss)}、qty <= ${state.risk.maxContracts}、position = 0、無 working orders，才允許 Demo/Paper 下單。
-6. 若 position = 0 且商品列表出現數字，不得單獨視為持倉；請依部位判讀優先順序確認。`;
+5. New Entry Mode：只有當 position = 0、無 working orders、qty <= ${state.risk.maxContracts}、候選 setup_score >= 72、confidence >= 68、RR >= ${state.risk.minimumRR}、stop <= ${formatMoneyLike(state.risk.stopLoss)}，才允許 Demo/Paper 新進場。
+6. Emergency Risk Mode：若已有持倉，不再套用 position = 0 條件；改用 Emergency Risk Mode 規則，允許 Exit / Reduce / Cancel 不匹配掛單，禁止新增 Buy / Sell 加碼。
+7. 若 position = 0 且商品列表出現數字，不得單獨視為持倉；請依部位判讀優先順序確認。`;
   }
   if (state.mode === "Live") {
     return `1. Live 模式不允許自動點擊交易按鈕；只產生 Live-ready 交易規格。
@@ -899,6 +945,40 @@ function buildExecutionPolicy() {
 4. 即使 setup 合格，也只能輸出「需要人工確認」，不得自行執行。`;
   }
   return "1. 尚未選擇使用模式，execution_allowed=false。";
+}
+
+function buildEmergencyPolicy() {
+  if (state.mode === "Read-Only") {
+    return `1. Read-Only 模式只能標記緊急風控狀態，不得點擊 Exit、Close、Cancel、Reduce 或任何交易按鈕。
+2. 若發現浮虧超限、口數超限、沒有 stop 或掛單不匹配，必須使用 NOTIFY，要求人工立即處理。`;
+  }
+  if (state.mode === "Demo") {
+    return `1. Emergency Risk Mode 的優先權高於 New Entry Mode；它不是新交易，而是 Demo / Replay / Paper 的風控處理。
+2. 只要出現以下任一情況，立即進入 Emergency Risk Mode：
+   - open P/L 或部位浮虧超過單筆最大止損 ${formatMoneyLike(state.risk.stopLoss)}。
+   - position 絕對值超過最大口數 ${state.risk.maxContracts}。
+   - 已有持倉但沒有有效 stop。
+   - working stop / limit / bracket 與目前持倉方向或口數不匹配。
+   - 價格已觸發失效條件，但部位仍未出場。
+   - 加碼規則為「${state.risk.addOnRule}」，但畫面出現新增同方向部位。
+3. Emergency Risk Mode 允許的 Demo / Paper 動作：
+   - Exit at Mkt & Cxl：當浮虧超限、沒有有效 stop、口數超限或掛單混亂時優先使用。
+   - Reduce：當平台可明確減倉且能把口數降回 ${state.risk.maxContracts} 以下時使用。
+   - Cancel / Replace：只用於取消不匹配或危險的 working orders；不得用來放寬風控。
+4. Emergency Risk Mode 禁止動作：
+   - 不得新增同方向 Buy / Sell 加碼。
+   - 不得移遠 stop。
+   - 不得為了等待反彈而忽略超損或超口數。
+5. 若 Exit at Mkt & Cxl 按鈕清楚可見、商品與部位明確、帳戶明確是 Demo / Replay / Paper、且風控已被觸發，execution_allowed=true；每輪最多點擊一次，點擊後必須檢查成交或部位是否歸零。
+6. 若 bracket / working orders 狀態不清楚，但 Exit at Mkt & Cxl 明確表示會取消掛單並平倉，Demo / Replay / Paper 中可優先使用 Exit at Mkt & Cxl 處理超風控狀態。
+7. 若帳戶模式不明、商品不明、Exit 不可見、或平台顯示 Real / Live，execution_allowed=false，使用 NOTIFY 要求人工處理。`;
+  }
+  if (state.mode === "Live") {
+    return `1. Live 模式不允許自動執行 Emergency Risk 動作。
+2. 若發現浮虧超限、口數超限、沒有 stop 或掛單不匹配，必須使用 NOTIFY，要求人工確認是否 Exit / Reduce / Cancel。
+3. 未取得人工確認前不得點擊任何交易按鈕。`;
+  }
+  return "1. 尚未選擇使用模式，Emergency Risk Mode 不允許自動操作。";
 }
 
 function flashButton(button, text) {
