@@ -15,14 +15,9 @@ const steps = [
     key: "personality"
   },
   {
-    title: "選擇目標",
-    hint: "告訴角色團隊你最重視勝率、穩定、收益、回撤或進場速度。",
-    key: "goal"
-  },
-  {
-    title: "選擇風格",
-    hint: "保守會降低交易頻率；進攻會提高機會，但也提高假訊號風險。",
-    key: "style"
+    title: "設定目標與風格",
+    hint: "選擇你最重視的交易目標，以及偏保守、平衡或進攻的執行風格。",
+    key: "goalStyle"
   },
   {
     title: "選擇重要參考指標",
@@ -291,8 +286,7 @@ const validationMessages = {
   market: "請先選擇市場，再進入下一步。",
   mode: "請先選擇使用模式：Read-Only、Demo 或 Live。",
   personality: "請先選擇交易人格，再進入下一步。",
-  goal: "請先選擇交易目標，再進入下一步。",
-  style: "請先選擇交易風格，再進入指標選擇。",
+  goalStyle: "請先選擇交易目標與交易風格，再進入指標選擇。",
   indicators: "請至少選擇 1 個參考指標，讓設定檔能產生畫面提示規格。",
   risk: "請確認風控設定：止損與每日最大虧損必須大於 0，最低盈虧比至少 0.5，最大口數必須是 1 以上的整數。",
   agents: "請至少選擇 3 位交易角色，並保留 Risk Manager。"
@@ -355,7 +349,8 @@ function bindEvents() {
       markDirty();
       updateSelectedChoices();
       updateSummary();
-      if (state.step < 5) {
+      const shouldAutoAdvance = !["goal", "style"].includes(button.dataset.key);
+      if (shouldAutoAdvance && state.step < 4) {
         goToStep(state.step + 1);
       }
     });
@@ -426,8 +421,8 @@ function bindEvents() {
   $("togglePromptBtn").addEventListener("click", () => {
     $("promptPanel").classList.toggle("is-collapsed");
     $("togglePromptBtn").textContent = $("promptPanel").classList.contains("is-collapsed")
-      ? "展開設定檔"
-      : "收合設定檔";
+      ? "展開完整設定檔"
+      : "收合完整設定檔";
   });
 
   $("copyPromptBtn").addEventListener("click", async () => {
@@ -501,8 +496,7 @@ function validateStep(stepIndex) {
     market: Boolean(state.market),
     mode: Boolean(state.mode),
     personality: Boolean(state.personality),
-    goal: Boolean(state.goal),
-    style: Boolean(state.style),
+    goalStyle: Boolean(state.goal) && Boolean(state.style),
     indicators: selectedIndicators().length >= 1,
     risk: hasValidRiskSettings(),
     agents: selectedAgents().length >= 3 && agents.find(agent => agent.id === "risk")?.selected
@@ -574,7 +568,7 @@ function updateSummary() {
   $("summaryAgents").textContent = `${selectedAgents().length} 位已選`;
   $("readiness").textContent = isReady()
     ? "設定已完成，可以產生交易設定檔。"
-    : "完成 8 個步驟後，會顯示策略預覽與交易設定檔。";
+    : "完成 7 個步驟後，會顯示 Prompt 與交易設定摘要。";
 }
 
 function updateIndicatorCount() {
@@ -725,9 +719,13 @@ function buildPrompt() {
   const modeRules = buildModeRules();
   const executionPolicy = buildExecutionPolicy();
   const emergencyPolicy = buildEmergencyPolicy();
+  const orchestratorWorkflow = buildOrchestratorWorkflow();
+  const failureMessages = buildFailureMessages();
   return `# 交易自動化設定檔
 
-你是我的交易流程協調者與畫面提示規格設計師。請用清楚、果斷、風控優先的方式，根據以下選項產生自動化交易設定檔、畫面提示規格與測試計畫。Demo / Replay 的目標是有效測試策略，不要因為輔助資訊不完整而永遠不交易；但超出風控時必須先處理風險。
+你是我的交易流程協調者。請優先使用 \`mnq-demo-trading-orchestrator\` 的思路執行每一輪交易 heartbeat。顧客只需要 Codex 帳號、Codex in-app browser，以及自己的 TradingView / Tradovate / TradeDay / Paper Trading 網頁登入；不得要求顧客安裝套件、clone repo、執行 Python/npm/CLI 或安裝 broker SDK。
+
+請用清楚、果斷、風控優先的方式，根據以下選項產生自動化交易設定檔、畫面提示規格與測試計畫。Demo / Replay 的目標是有效測試策略，不要因為輔助資訊不完整而永遠不交易；但超出風控時必須先處理風險。
 
 ## 使用者設定
 - 市場：${state.market}
@@ -744,6 +742,15 @@ function buildPrompt() {
 - 加碼規則：${state.risk.addOnRule}
 - 快速組合：${presets.find(preset => preset.id === state.preset)?.label || "Custom"}
 - 執行範圍：${modeExecutionScope()}
+
+## Codex-only 使用原則
+1. 顧客不需要安裝任何套件、不需要下載 repo、不需要執行本機腳本。
+2. 顧客需要自行在 Codex in-app browser 登入交易或圖表平台。
+3. Codex 帳號不等於 broker 帳號，也不代表已授權真實資金交易。
+4. 所有 Live-ready 或真實資金相關動作都必須人工確認。
+
+## Orchestrator workflow
+${orchestratorWorkflow}
 
 ## 使用模式規則
 ${modeRules}
@@ -771,6 +778,10 @@ ${modeRules}
 2. 必須在風險段落標註不可見資訊。
 3. 降低 confidence 或 setup_score。
 4. 但不得只因輔助指標不可見就直接阻擋 Demo / Replay / Paper 測試。
+
+## 顧客修復提示
+當畫面不安全或資訊不足時，請使用以下短句，不要輸出長篇規則：
+${failureMessages}
 
 ## 部位與帳戶判讀優先順序
 1. 實際部位以交易面板 Position、Orders/Positions 面板的 open position、avg price、working orders 為主。
@@ -892,6 +903,35 @@ Agent 分析：進場｜估計勝率 80%
 </heartbeat>
 
 請保持語氣溫和、具體、可執行，不要誇大勝率，也不要把任何建議當成真實帳戶自動交易授權。`;
+}
+
+function buildOrchestratorWorkflow() {
+  return `每輪 heartbeat 必須依序執行，不得跳步：
+1. Safety Agent：確認平台、帳戶模式、商品、qty、position、PnL、Close/Exit、working orders、上一輪 fill status。
+2. Authorization Agent：依使用模式判斷 read_only、demo_auto_execute、live_ready_manual_confirm 或 blocked。
+3. Market Scan Agent：讀取可見 K 線、VWAP/MA、MACD、RSI、Volume、支撐壓力，產生候選 setup；不得授權下單。
+4. Risk Manager Agent：檢查日損、日利、單筆止損、RR、最大口數、加碼規則；可否決任何新進場。
+5. TP/SL Agent：輸出 entry、manual_stop、manual_take_profit、RR、invalidation、reduce_zone、breakeven_rule。
+6. Position Manager Agent：先管理既有部位，再考慮新進場；position 不清楚時不得加碼。
+7. Execution Agent：只有前面全部通過時，才可在 Demo / Replay / Paper 每輪最多點擊一次。
+8. Heartbeat Reporter Agent：最後只輸出簡短 XML；普通等待用 DONT_NOTIFY，執行、成交不明、Real/Live 風險或人工介入用 NOTIFY。
+
+權限邊界：
+- Market Scan 只能分析，不能授權。
+- Execution 不能覆蓋 Safety、Authorization 或 Risk Manager。
+- Risk Manager 擁有否決權。
+- Real / Live / 帳戶模式不明時，禁止自動點擊。`;
+}
+
+function buildFailureMessages() {
+  return `- 帳戶模式不明：帳戶模式無法確認，暫停自動操作。請確認畫面是 Demo、Replay 或 Paper Trading。
+- Real / Live：畫面出現 Real / Live / 真實帳戶，禁止自動點擊。
+- 商品不明：商品無法確認為 ${state.market || "指定市場"}，暫停。
+- qty 不可見：qty 不可見，不能安全確認下單口數。
+- PnL 不可見：PnL 不可見，不能確認日內風險狀態。
+- Close / Exit 不可見：Close / Exit 控制不可見，不能安全管理部位。
+- 成交不明：上一個點擊成交狀態不明，禁止重複點擊。
+- 掛單不明：Working orders 狀態不明，請人工確認是否有危險掛單。`;
 }
 
 function modeExecutionScope() {
