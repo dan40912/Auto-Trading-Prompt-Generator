@@ -392,6 +392,15 @@ h1 {
   line-height: 1.45;
 }
 
+.agent-card em {
+  display: block;
+  margin-top: 8px;
+  color: var(--soft);
+  font-size: 12px;
+  font-style: normal;
+  line-height: 1.45;
+}
+
 .agent-card small,
 .indicator-card small {
   display: inline-flex;
@@ -494,6 +503,62 @@ h1 {
   color: var(--muted);
   font-size: 12px;
   line-height: 1.45;
+}
+
+.schedule-field,
+.schedule-window {
+  grid-column: 1 / -1;
+}
+
+.schedule-window.is-hidden {
+  display: none;
+}
+
+.segmented-control,
+.quick-days,
+.weekday-picker,
+.time-window {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.segment,
+.weekday-picker label {
+  min-height: 38px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #05080a;
+  color: var(--muted);
+  padding: 0 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.segment.selected,
+.weekday-picker label.selected {
+  border-color: var(--green);
+  background: rgba(25, 195, 125, .12);
+  color: var(--text);
+}
+
+.weekday-picker label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+}
+
+.weekday-picker input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.time-window label {
+  display: grid;
+  gap: 6px;
+  flex: 1 1 180px;
 }
 
 .team-builder-head > span {
@@ -1119,6 +1184,10 @@ h1 {
   display: block;
   color: var(--text);
   margin-bottom: 4px;
+}
+
+.selected-agent span {
+  display: block;
 }
 
 .decision-preview {

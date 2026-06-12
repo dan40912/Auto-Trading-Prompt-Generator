@@ -1,25 +1,24 @@
-# AI-Trading
+# Auto-Trading-Prompt-Generator
 
-AI-Trading 是一套 **Codex-only、零安裝** 的 AI 交易 Prompt Starter 與 Skill 規格。目標是讓顧客只需要 Codex 帳號、Codex in-app browser，以及自己的交易平台網頁登入，就能用 AI 進行 Demo、Replay 或 Paper Trading 工作流。
+Auto-Trading-Prompt-Generator是一套 **零安裝** 的 AI 交易 Prompt Starter 。目標是讓顧客只需要 ChatGPT & Codex 加上一個網頁端交易的平台，就可以讓AI 設定定時，自動的操作，不需要額外安裝任何工具 或Skill．
 
-顧客不需要安裝 Python、npm、broker SDK、瀏覽器擴充套件，也不需要 clone 這個 repo。
+很簡單，透過UI 找到你的交易策略，然後設定多Agent 監管， **請務必確保 Token充足** 在全部交易期間可以流暢地讓AI接管你的交易介面，並且留下紀錄．
 
-> Codex 帳號不等於 broker 帳號，也不代表已授權真實資金交易。本專案預設只用於 Demo、Replay、Paper Trading；Real / Live 相關動作必須人工確認。
 
 ## 核心定位
 
-- **Starter**：用 7 個步驟產生可貼進 Codex 的 trading prompt。
-- **Orchestrator Skill**：固定每輪 heartbeat 的安全檢查、授權、行情掃描、風控、TP/SL、部位管理、執行與回報順序。
-- **Safety-first Workflow**：任何 Real / Live / 帳戶模式不明 / qty 不明 / PnL 不明 / Close/Exit 不可見，都必須 fail closed。
+- **Starter**：用 7 個步驟產生可貼進 AI 的 trading prompt。
+- **Skill**：根據Promt 嚴格執行，固定每輪 heartbeat 的安全檢查、授權、行情掃描、風控、TP/SL、部位管理、執行與回報順序。
+- **Safety-first Workflow**：任何不明確或勝率不高的地方給出建議，不要瞎忙瞎虧錢，只有有把握的訂單才進場。
 - **Short Trading Card Output**：最終輸出以短版交易卡為主，完整設定檔可展開查看或複製。
 
 ## 顧客如何使用
 
-1. 開啟 Codex。
-2. 在 Codex in-app browser 開啟 TradingView、Tradovate、TradeDay 或支援的 Paper Trading 頁面。
-3. 使用 Starter 產生 Codex-ready prompt。
-4. 確認交易畫面是 Demo、Replay 或 Paper Trading。
-5. 將 prompt 貼到 Codex，讓 Codex 依照 orchestrator workflow 分析、風控、等待或在允許模式下執行 Demo 操作。
+1. 產生提示詞，貼到AI工具中，以下為Codex為範例
+2. 在 Codex in-app browser 開啟 TradingView／Tradovate／TradeDay／Binance 交易介面。
+3. 跟你的ＡＩ確定自動化流程多久會看一次？權限設定？是否需要審核？
+4. 交易後留下自我評判，看後續如何改進
+5. 讓AI去批評之前的交易策略，並自我改進，進入下一輪的市場
 
 ## Starter 流程
 
@@ -41,60 +40,14 @@ Starter 目前是靜態網頁，入口是 [index.html](./index.html)。
 - 右側：`你的交易設定已建立`、策略摘要、角色分歧、風控與決策邏輯。
 - 下方：視覺預覽。
 
-## 開發者快速開始
-
-這段只給維護本專案的人使用。顧客不需要執行這些步驟。
-
-直接開啟：
-
-```bash
-open index.html
-```
-
-或啟動本機靜態伺服器：
-
-```bash
-python3 -m http.server 8080
-```
-
-然後開啟：
-
-```text
-http://localhost:8080
-```
 
 ## 安全原則
 
-- 預設只使用 Demo、Replay 或 Paper Trading。
-- 不把 Real / Live 帳戶當成自動點擊測試環境。
-- Codex 無法確認帳戶模式、商品、qty、position、PnL、Close/Exit 或成交狀態時，必須等待或要求人工介入。
+- 預設只使用 Demo、Replay 或 Paper Trading，請自行評估是否要進行 真倉交易。
+- 止盈止損嚴格依照風控要求。
 - 每輪 heartbeat 最多一個動作。
 - 無法確認成交時，不得重複點擊。
-- README、Skill、docs 不應提交個人路徑、thread id、帳戶資訊、API key、token 或 broker 密碼。
 
-## Orchestrator Workflow
-
-每輪 heartbeat 建議先使用 [skills/mnq-demo-trading-orchestrator/SKILL.md](./skills/mnq-demo-trading-orchestrator/SKILL.md) 作為入口。
-
-固定順序：
-
-```text
-platform-safety
--> authorization-modes
--> market-scan
--> risk-control
--> take-profit-stop-loss
--> position-management
--> order-execution
--> heartbeat-reporting
-```
-
-權限邊界：
-
-- Market Scan 只能分析，不能授權下單。
-- Execution 不能覆蓋 Safety、Authorization 或 Risk Manager。
-- Risk Manager 擁有否決權。
-- Real / Live / 帳戶模式不明時，禁止自動點擊。
 
 ## Skill 清單
 
@@ -150,7 +103,6 @@ AI-Trading/
 - [Codex-only product direction](./docs/codex-only-product-direction.md)：產品方向與零安裝原則。
 - [HKUDS AI-Trader reference analysis](./docs/ai-trader-reference-analysis.md)：參考專案可學習處與不應複製處。
 - [Multi-agent prompts and implementation targets](./docs/multi-agent-prompts-and-implementation.md)：多 agent prompts 與可實作 backlog。
-- [Roadmap](./docs/roadmap.md)：30 / 60 / 90 天實作節奏。
 - [QA report](./docs/qa-report-codex-only.md)：Codex-only starter 的 QA 紀錄。
 - [Run log schema](./docs/api/demo-trading-run.schema.json)：單輪 heartbeat 的內部結構化 contract。
 - [Trading run logs](./runs/README.md)：run log 與 screenshot 的安全保存規範。
@@ -172,22 +124,4 @@ AI-Trading/
 - API key、token、session、密碼
 - 顧客個資
 - 私人 PnL 或部位紀錄
-
-## 目前狀態
-
-已完成：
-
-- Codex-only Starter 首頁文案。
-- 7 步設定流程。
-- 第 7 步後顯示 Prompt / 交易設定摘要結果區。
-- Orchestrator skill。
-- Run log 安全規範。
-- HKUDS/AI-Trader 參考分析。
-- 初版 QA report。
-
-下一步建議：
-
-- 用真實 Demo / Replay / Paper Trading 畫面測 Codex in-app browser 行為。
-- 把 Starter 部署成公開靜態頁。
-- 補充每種模式的範例 prompt：Read-Only、Demo、Replay、Paper、Live-ready。
 

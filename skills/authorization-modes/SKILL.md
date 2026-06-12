@@ -1,6 +1,6 @@
 ---
 name: authorization-modes
-description: Define and enforce authorization levels for AI-assisted MNQ/MNQM6 trading automations. Use when Codex must decide whether it may only observe, analyze, request confirmation, manage existing Demo/Replay/Paper positions, auto execute Demo trades, or block all Real/Live execution.
+description: Define and enforce AI-Trading authorization modes: Demo Auto, Paper Auto, Replay Auto, Live View, Live Approve, and Live Auto.
 ---
 
 # Authorization Modes
@@ -13,50 +13,49 @@ Use this skill before any action that might click a trading control. Authorizati
 
 | Mode | Meaning | Click Permission |
 | --- | --- | --- |
-| `observe_only` | Observe chart and platform only | No clicks |
-| `analysis_only` | Analyze setup, RR, stop, target | No clicks |
-| `confirm_required` | Notify user before action | No clicks until confirmed |
-| `demo_auto_manage` | Manage existing Demo/Replay/Paper position | Close/Reduce/Add only if risk allows |
-| `demo_auto_execute` | Open and manage Demo/Replay/Paper trades | Buy/Sell/Add/Reduce/Close if all checks pass |
-| `live_blocked` | Explicitly block Real/Live action | No clicks |
-
-## Default
-
-Use this default in public examples:
-
-```text
-authorization_mode = observe_only
-```
-
-Only use `demo_auto_execute` when explicitly requested by the user and platform safety confirms Demo/Replay/Paper.
+| `Demo Auto` | Demo environment automation | Buy / Sell / Close / Reduce only when all checks pass |
+| `Paper Auto` | Paper Trading automation | Buy / Sell / Close / Reduce only when all checks pass |
+| `Replay Auto` | Replay / simulated trading automation | Buy / Sell / Close / Reduce only when all checks pass |
+| `Live View` | Live chart/account view only | No clicks |
+| `Live Approve` | Live recommendation with manual approval | No clicks until user confirms the exact action |
+| `Live Auto` | Live auto execution after explicit user authorization | Clicks allowed only when explicit Live Auto authorization and all checks pass |
 
 ## Enforcement
 
 Set `execution_allowed=false` when:
 
-- Mode is `observe_only`.
-- Mode is `analysis_only`.
-- Mode is `confirm_required` and confirmation has not been received.
-- Mode is `live_blocked`.
+- Mode is `Live View`.
+- Mode is `Live Approve` and user confirmation has not been received.
+- Mode is unclear.
 - Platform safety fails.
 - Risk control fails.
+- Account mode, product, qty, current position, PnL, or controls cannot be confirmed.
 
-Even with `demo_auto_execute`, execution still requires:
+Set `execution_allowed=true` only when:
 
-- Demo/Replay/Paper confirmed.
-- MNQ/MNQM6 confirmed.
-- Close/Exit visible.
-- Risk limits clear.
-- Valid setup and RR.
-- One action maximum per heartbeat.
+- Mode is `Demo Auto`, `Paper Auto`, `Replay Auto`, or explicitly authorized `Live Auto`.
+- Platform safety passes.
+- Risk control passes.
+- Market scan has a valid setup.
+- Order execution requirements pass.
+
+## Fail Closed Output
+
+If current mode cannot be confirmed, final output should be:
+
+```text
+Action: MANUAL
+Reason: 無法確認交易模式
+Next: 請確認 Demo / Paper / Replay / Live 授權狀態
+```
 
 ## Output
 
-Return:
+Return internal fields:
 
 - authorization_mode
 - clicks_allowed
 - allowed_actions
 - blocked_actions
+- manual_confirmation_required
 - authorization_reason
-

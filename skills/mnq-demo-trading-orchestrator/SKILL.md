@@ -1,155 +1,185 @@
 ---
 name: mnq-demo-trading-orchestrator
-description: Orchestrate one safe MNQ/MNQM6 Demo, Replay, or Paper Trading heartbeat round. Use when Codex must run the full trading workflow in order, combine platform safety, authorization, market scan, risk, TP/SL, position management, execution, and final heartbeat reporting without skipping guardrails.
+description: Orchestrate one safe AI-Trading heartbeat round. Use when Codex must run master policy, platform safety, authorization, market scan, risk, TP/SL, position management, execution, and final Trading Action Card reporting without skipping guardrails.
 ---
 
-# MNQ Demo Trading Orchestrator
+# AI-Trading Orchestrator
 
 ## Purpose
 
-Use this skill as the top-level workflow controller for one MNQ/MNQM6 heartbeat round. It does not replace the specialized skills. It decides the required order and fail-closed handoff between them.
+Use this skill as the top-level workflow controller for one heartbeat round. It does not replace specialized skills. It decides order, conflict priority, and fail-closed handoff.
 
 ## Required Skill Order
 
 Run every heartbeat round in this order:
 
-1. `platform-safety`
-2. `authorization-modes`
-3. `market-scan`
-4. `risk-control`
-5. `take-profit-stop-loss`
-6. `position-management`
-7. `order-execution`
-8. `heartbeat-reporting`
+1. `master-trading-policy`
+2. `platform-safety`
+3. `authorization-modes`
+4. `market-scan`
+5. `risk-control`
+6. `take-profit-stop-loss`
+7. `position-management`
+8. `order-execution`
+9. `heartbeat-reporting`
 
 Do not skip earlier skills because a later setup looks attractive. A valid market setup is not execution permission.
+
+## Execution Schedule
+
+Use the Starter UI schedule for heartbeat timing:
+
+- Default interval: 60 seconds.
+- User may set any positive integer interval in seconds.
+- User may choose not to limit execution by schedule; in that case, keep running on the interval until the user stops the workflow.
+- User may enable a schedule window with selected weekdays and optional daily start/end times.
+- Start and end times use the local computer timezone, not automatic exchange-time conversion.
+- The user must manually convert the target exchange session. For US equities/futures, consider US trading hours and daylight saving time.
+
+If outside the allowed daily time window:
+
+- Non-selected day: output `Action: WAIT`, `Reason: 非自動執行日`.
+- Before start time: output `Action: WAIT`, `Reason: 尚未到自動執行時間`.
+- After end time with no position: output `Action: WAIT`, `Reason: 已超過自動執行時間`.
+- After end time with an open position: manage only existing position risk; do not open or add.
+
+Do not ask the user to install schedulers, packages, broker SDKs, or API integrations.
 
 ## Agent Handoff Contract
 
 | Agent | Responsibility | Allowed Actions | Prohibited Actions | Required Outputs |
 | --- | --- | --- | --- | --- |
-| Safety Agent | Verify platform, account mode, symbol, controls, PnL, qty, position, working orders, and prior fill status. | Mark execution allowed or blocked. Identify unsafe screen state. | Never interpret a trade setup. Never authorize a click when account mode is unclear. | `platform`, `account_mode`, `live_risk_detected`, `symbol_confirmed`, `controls_visible`, `close_exit_visible`, `qty_status`, `pnl_visible`, `working_orders_status`, `execution_allowed`, `safety_reason` |
-| Authorization Agent | Match the visible environment to the selected mode. | Confirm `read_only`, `demo_auto_execute`, or `live_ready_manual_confirm`. | Never convert Live-ready into auto-execute permission. | `authorization_mode`, `allowed_actions`, `blocked_actions`, `manual_confirmation_required` |
-| Market Scan Agent | Read visible chart context and produce candidate setups. | Score Buy/Sell/Wait candidates. Lower confidence for missing indicators. | Never authorize execution. Never invent hidden indicator values. | `trend`, `visible_indicators`, `not_visible_indicators`, `support`, `resistance`, `direction`, `setup_score`, `confidence`, `next_trigger` |
-| Risk Manager Agent | Apply daily PnL, max loss, max contracts, RR, add-risk, and safety overrides. | Veto new entries. Allow close/reduce-only state. | Never loosen limits because setup quality is high. | `execution_allowed`, `new_entries_allowed`, `add_allowed`, `close_reduce_only`, `risk_reason`, `daily_pnl_status`, `position_risk_status` |
-| TP/SL Agent | Convert a valid setup into entry, stop, target, RR, and invalidation. | Reject setups with missing stop, target, or RR. | Never use fixed stop/target when structure contradicts it. | `entry`, `manual_stop`, `manual_take_profit`, `RR`, `invalidation`, `reduce_zone`, `breakeven_rule` |
-| Position Manager Agent | Decide whether current position needs hold, reduce, close, or manual intervention. | Prioritize existing position risk over new entry ideas. | Never add when position state is unclear. | `position_status`, `position_size`, `open_pnl`, `position_risk_status`, `management_action` |
-| Execution Agent | Execute only one permitted Demo/Replay/Paper action after all prior checks pass. | Buy, Sell, Reduce, Close, Cancel, or Wait according to mode and risk. | Never override Safety, Authorization, or Risk Manager. Never repeat an unclear click. | `action`, `clicked`, `qty`, `fill_confirmed`, `execution_reason`, `required_manual_intervention` |
-| Heartbeat Reporter Agent | Produce the final concise XML status. | Use `NOTIFY` for execution, unclear fills, Real/Live risk, or manual intervention. Use `DONT_NOTIFY` for ordinary Wait. | Never output JSON as the final heartbeat. Never hide missing safety status. | `notify`, `decision`, `execution_allowed`, `action`, `message` |
+| Master Policy Agent | Resolve priority between safety, authorization, user Starter settings, risk, scan, execution, and output. | Apply latest Starter settings when safe. | Never let user settings override safety or risk. | `priority_result`, `starter_settings_applied`, `blocked_by_policy` |
+| Safety Agent | Verify platform, account mode, product, position, qty, controls, Live authorization, and action-direction safety. | Mark execution allowed or blocked. | Never interpret trade setup. | `execution_allowed`, `safety_reason` |
+| Authorization Agent | Match selected mode to current visible environment. | Allow Demo / Paper / Replay Auto or explicit Live Auto only when valid. | Never convert Live View or unconfirmed Live Approve into auto execution. | `authorization_mode`, `clicks_allowed`, `manual_confirmation_required` |
+| Market Scan Agent | Read trend, key levels, indicators, volume, candles, and tradable zones. | Produce setup bias and next trigger. | Never authorize execution or click. | `direction`, `setup_score`, `confidence`, `reason`, `next_trigger` |
+| Risk Manager Agent | Apply SL, TP, RR, daily loss, drawdown, max contracts, volatility, averaging, and invalidation rules. | Veto entries. Require WAIT, reduce, close, or manual handling. | Never loosen limits because setup quality is high. | `execution_allowed`, `new_entries_allowed`, `reduce_or_close_required`, `risk_reason` |
+| TP/SL Agent | Convert valid setup into entry, SL, TP, RR, and invalidation. | Reject incomplete setups. | Never use a structure-invalid stop or target. | `entry`, `SL`, `TP`, `RR`, `invalidation` |
+| Position Manager Agent | Decide hold, reduce, close, or manual intervention for existing positions. | Prioritize existing risk over new entries. | Never add when position state is unclear. | `position_status`, `position_size`, `management_action` |
+| Execution Agent | Execute only one permitted action after all prior checks pass. | Buy, Sell, Reduce, Close, or Wait by mode and risk. | Never override safety, authorization, or risk. | `action`, `clicked`, `qty`, `fill_confirmed`, `execution_reason` |
+| Heartbeat Reporter Agent | Produce final Chinese Trading Action Card. | Output 多單, 空單, 平倉, 減倉, WAIT, or MANUAL. | Never output JSON/XML or full Agent discussion unless Review mode. | `Action`, `Reason`, optional trade fields |
+
+## Mode Policy
+
+- `Demo Auto`: may auto execute only in confirmed Demo when all checks pass.
+- `Paper Auto`: may auto execute only in confirmed Paper Trading when all checks pass.
+- `Replay Auto`: may auto execute only in confirmed Replay / simulated trading when all checks pass.
+- `Live View`: analysis only; no order clicks.
+- `Live Approve`: recommendations only until the user confirms the exact action.
+- `Live Auto`: auto execution only after explicit user selection and risk confirmation.
+
+## Entry Gate Policy
+
+Use dynamic entry gates from Starter settings:
+
+- Aggressive only when `style = 進攻` and preset is `Scalper`: `setup_score >= 65`, `confidence >= 62`
+- Balanced / Hybrid: `setup_score >= 70`, `confidence >= 66`
+- Conservative / 保守 uses at least Balanced: `setup_score >= 70`, `confidence >= 66`
+
+`Conservative Swing with Fast Entry` is not `Aggressive Scalper`.
+
+All entry gates still require user minimum RR, user maximum single loss, user maximum quantity, `position = 0`, and no dangerous or conflicting working orders.
+
+## Auto Mode Relaxations
+
+In Demo Auto, Paper Auto, and Replay Auto, optional missing indicators only reduce confidence. They do not cause MANUAL by themselves.
+
+Replay Auto may continue with a new candidate when daily PnL is hidden if `position = 0`, core safety is visible, and no dangerous working order exists. Use daily PnL = 0 only as a replay testing estimate.
+
+Compact / Auto mode requires Risk Manager plus one non-aligned risk check. Review mode is the only mode that requires three opposing views.
+
+## Candidate Setup Visibility
+
+Every heartbeat should create an internal candidate setup when possible.
+
+Compact mode must not output the full setup. If WAIT is returned, output only the shortest main blocking reason.
+
+Review mode may expand candidate setup and Agent analysis.
 
 ## Fail-Closed Rules
 
 Immediately block execution and continue to `heartbeat-reporting` when:
 
-- Account mode is Real, Live, or unclear.
-- Symbol is not MNQ or MNQM6.
-- Position, qty, PnL, current price, or Close/Exit control is hidden.
+- Account mode is unclear or unauthorized.
+- Product is unclear or wrong.
+- Current position, qty, PnL, current price, or required controls are hidden.
 - Previous click fill status is unknown.
 - Working orders are unclear.
-- Daily PnL has hit the profit lockout or loss stop.
-- Entry, manual stop, manual take profit, RR, or invalidation is missing.
+- Daily PnL has hit profit lockout or loss stop.
+- Entry, SL, TP, RR, or invalidation is missing.
 - More than one click would be needed in the same heartbeat round.
+- Selected mode does not permit the required action.
 
-When blocked, the only allowed execution decision is `Wait`, `Close`, `Reduce`, or `Manual Intervention`, depending on the visible position risk.
+Working orders are not a hard block when they are clearly inactive, cancelled, unrelated to the product, or shown as absent. They are a hard block or MANUAL only when dangerous, conflicting, unclear, wrong product, unclear quantity, duplicate-entry risk, or previous fill status is unclear.
 
-## Failure Messages
-
-Use short, stable reasons so the customer understands what to fix:
-
-- Account mode unclear: `帳戶模式無法確認，暫停自動操作。請確認畫面是 Demo、Replay 或 Paper Trading。`
-- Real or Live detected: `畫面出現 Real / Live / 真實帳戶，禁止自動點擊。`
-- Symbol unclear: `商品無法確認為 MNQ / MNQM6，暫停。`
-- Qty hidden: `qty 不可見，不能安全確認下單口數。`
-- PnL hidden: `PnL 不可見，不能確認日內風險狀態。`
-- Close/Exit hidden: `Close / Exit 控制不可見，不能安全管理部位。`
-- Fill unclear: `上一個點擊成交狀態不明，禁止重複點擊。`
-- Working orders unclear: `Working orders 狀態不明，請人工確認是否有危險掛單。`
-
-## Workflow Contract
-
-Before final XML reporting, maintain these internal fields:
-
-- `environment_status`
-- `authorization_mode`
-- `safety_result`
-- `market_scan_result`
-- `risk_result`
-- `tp_sl_result`
-- `position_result`
-- `execution_decision`
-- `action_taken`
-- `fill_status`
-- `blocked_reason`
-- `manual_intervention_required`
-- `next_run_instruction`
-
-These fields may be used for local run logs or schema validation, but the final heartbeat response must still follow `heartbeat-reporting` XML rules.
+When blocked, final Action must be `WAIT`, `平倉`, `減倉`, or `MANUAL`, depending on visible position risk.
 
 ## Decision Policy
 
 Use the strictest result when skills disagree:
 
-- If safety blocks execution, execution is blocked.
-- If authorization blocks automation, execution is blocked.
-- If risk blocks new entries, do not open a position.
-- If TP/SL cannot define `RR >= 1.2`, wait.
-- If position data is unclear, do not add. Prefer reduce, close, or manual intervention only when controls and position are visible.
-- If execution occurs but fill cannot be confirmed, stop all further clicks and require manual intervention.
+- Safety block means execution is blocked.
+- Authorization block means execution is blocked.
+- Risk block means no new entry.
+- Missing TP/SL/RR means WAIT or MANUAL.
+- Unclear position means no add.
+- Unknown fill status means stop all further clicks and require MANUAL.
 
-## Output
+## Final Output
 
-The final response must be produced through `heartbeat-reporting`.
+The final response must be produced through `heartbeat-reporting` as a Chinese Trading Action Card.
 
-Return XML with:
+No trade:
 
-- `notify`
-- `decision`
-- `execution_allowed`
-- `action`
-- `message`
-
-The message must include safety status, trend, MACD, RSI, Volume, reason, key levels, fill status when relevant, and next step.
-
-## Example Final Heartbeat XML
-
-Ordinary wait:
-
-```xml
-<heartbeat>
-  <DONT_NOTIFY/>
-  <message>
-Agent 分析：等待｜估計勝率 58%
-Agent 分析：進場｜不允許
-綜合評比：等待確認
-理由：setup_score 66/72、confidence 61/68，RR 達標但價格尚未觸發進場條件。
-  </message>
-</heartbeat>
+```text
+Action: WAIT
+Reason: 候選不合格：confidence 61 < 62
 ```
 
-Manual intervention:
+Manual:
 
-```xml
-<heartbeat>
-  <NOTIFY/>
-  <message>
-Agent 分析：等待｜勝率資料不足
-Agent 分析：進場｜不允許
-綜合評比：需要人工確認，暫不進場
-理由：帳戶模式無法確認，禁止自動點擊。
-  </message>
-</heartbeat>
+```text
+Action: MANUAL
+Reason: 無法確認交易模式
+Next: 請確認 Demo / Paper / Replay / Live 授權狀態
 ```
 
-Demo execution:
+Long:
 
-```xml
-<heartbeat>
-  <NOTIFY/>
-  <message>
-Agent 分析：等待｜估計勝率低於進場方案
-Agent 分析：進場｜估計勝率 76%
-綜合評比：已執行 Demo/Paper 進場
-理由：動作=Buy；商品=MNQ；qty=1；entry=已觸發；SL=結構低點；TP=下一壓力；RR=1.6；成交檢查=成交。
-  </message>
-</heartbeat>
+```text
+Action: 多單
+Volume: 1 lot
+Entry: Market
+TP: 4650.5
+SL: 4590
+Confidence: 75%
+Reason: MACD 即將黃金交叉，RSI < 20，價格即將往上穿越均線。
+```
+
+Short:
+
+```text
+Action: 空單
+Volume: 1 lot
+Entry: Market
+TP: 4520
+SL: 4595
+Confidence: 72%
+Reason: 價格跌破支撐，MACD 空方動能擴大，RSI 反彈失敗。
+```
+
+Close:
+
+```text
+Action: 平倉
+Volume: All
+Reason: 價格跌破主要支撐，原多方 thesis 失效。
+```
+
+Reduce:
+
+```text
+Action: 減倉
+Volume: 1 lot
+Reason: 波動擴大，風險升高，先降低部位。
 ```

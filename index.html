@@ -121,8 +121,8 @@
             <div class="team-builder-head">
               <div>
                 <span class="eyebrow">Step 6</span>
-                <h3>設定盈利目標、止損與風控</h3>
-                <p>這些限制會寫進設定檔，讓風控角色先檢查風險，再進入交易討論。</p>
+                <h3>設定盈利目標、止損、風控與自動執行</h3>
+                <p>這些限制會寫進設定檔，讓風控角色先檢查風險，再依照時間間隔進入交易討論。</p>
               </div>
               <span>風控優先</span>
             </div>
@@ -131,19 +131,19 @@
               <label class="risk-field">
                 <span>每日盈利目標</span>
                 <input id="profitTargetInput" type="number" min="0" step="50" value="3000" title="設定每日想達到的獲利目標。達標後偏向停止開新倉，只做回顧或管理既有部位。">
-                <small>例：300。達標後偏向停止新交易，避免把盈利吐回去。</small>
+                <small>預設：3000。達標後偏向停止新交易，避免把盈利吐回去。</small>
               </label>
 
               <label class="risk-field">
                 <span>單筆最大止損</span>
-                <input id="stopLossInput" type="number" min="1" step="10" value="1000" title="設定單筆交易可承受的最大虧損。若潛在止損超過此值，Risk Manager 必須阻擋。">
-                <small>例：100。任何 setup 超過這個止損上限都不應放行。</small>
+                <input id="stopLossInput" type="number" min="1" step="10" value="1500" title="設定單筆交易可承受的最大虧損。若潛在止損超過此值，Risk Manager 必須阻擋。">
+                <small>預設：1500。任何 setup 超過這個止損上限都不應放行。</small>
               </label>
 
               <label class="risk-field">
                 <span>每日最大虧損</span>
-                <input id="dailyLossInput" type="number" min="1" step="50" value="3000" title="設定每日最大虧損上限。達到後必須停止尋找新交易。">
-                <small>例：300。達到日損上限後，只允許等待、回顧或停止。</small>
+                <input id="dailyLossInput" type="number" min="1" step="50" value="2000" title="設定每日最大虧損上限。達到後必須停止尋找新交易。">
+                <small>預設：2000。達到日損上限後，只允許等待、回顧或停止。</small>
               </label>
 
               <label class="risk-field">
@@ -155,7 +155,7 @@
               <label class="risk-field">
                 <span>最大口數</span>
                 <input id="maxContractsInput" type="number" min="1" step="1" value="8" title="設定最多允許幾口合約。設定檔不可以自行提高口數。">
-                <small>例：1。避免在沒有授權下加大槓桿。</small>
+                <small>預設：8。避免在沒有授權下加大槓桿。</small>
               </label>
 
               <label class="risk-field">
@@ -168,6 +168,49 @@
                 </select>
                 <small>保守預設：不允許加碼。先讓策略乾淨、容易回測。</small>
               </label>
+
+              <label class="risk-field">
+                <span>自動執行間隔（秒）</span>
+                <input id="executionIntervalInput" type="number" min="1" step="1" value="60" title="設定 Codex 每隔幾秒執行一次交易 heartbeat。預設 60 秒。">
+                <small>預設：60 秒。使用秒為單位；數字越小，檢查越頻繁，也越耗 token。</small>
+              </label>
+
+              <section class="risk-field schedule-field">
+                <span>限制執行時段</span>
+                <div class="segmented-control" role="group" aria-label="是否限制自動執行時段">
+                  <button class="segment selected" id="scheduleAlwaysBtn" type="button">不限制</button>
+                  <button class="segment" id="scheduleWindowBtn" type="button">設定時段</button>
+                </div>
+                <small>不限制：每隔指定秒數持續執行。設定時段：只在指定星期與時間窗內執行。</small>
+              </section>
+
+              <section class="risk-field schedule-window is-hidden" id="scheduleWindowPanel">
+                <span>執行星期與時間窗</span>
+                <div class="quick-days">
+                  <button class="preset-chip selected" id="weekdaysBtn" type="button">週一到週五</button>
+                  <button class="preset-chip" id="everydayBtn" type="button">每天</button>
+                </div>
+                <div class="weekday-picker" aria-label="選擇自動執行星期">
+                  <label><input type="checkbox" value="0">日</label>
+                  <label><input type="checkbox" value="1" checked>一</label>
+                  <label><input type="checkbox" value="2" checked>二</label>
+                  <label><input type="checkbox" value="3" checked>三</label>
+                  <label><input type="checkbox" value="4" checked>四</label>
+                  <label><input type="checkbox" value="5" checked>五</label>
+                  <label><input type="checkbox" value="6">六</label>
+                </div>
+                <div class="time-window">
+                  <label>
+                    <span>開始</span>
+                    <input id="executionStartInput" type="time" title="設定每天自動執行開始時間。">
+                  </label>
+                  <label>
+                    <span>結束</span>
+                    <input id="executionEndInput" type="time" title="設定每天自動執行結束時間。">
+                  </label>
+                </div>
+                <small>時間以本台電腦時區為準；請自行換算交易所時間。美股請以美國交易時段為主，並考慮日光節約時間。</small>
+              </section>
             </div>
           </div>
         </div>
@@ -182,6 +225,14 @@
               </div>
               <span id="agentCount">0 位已選</span>
             </div>
+
+            <section class="team-section">
+              <div class="section-label">
+                <strong>Heartbeat Verbosity</strong>
+                <span>控制每輪 heartbeat 的輸出長度。Compact 最省 token；Review 才展開完整 Agent 分析。</span>
+              </div>
+              <div class="choice-grid compact-choice-grid" id="verbosityChoices"></div>
+            </section>
 
             <section class="team-section">
               <div class="section-label">
@@ -258,9 +309,11 @@
           <div><dt>目標</dt><dd id="summaryGoal">尚未選擇</dd></div>
           <div><dt>風格</dt><dd id="summaryStyle">尚未選擇</dd></div>
           <div><dt>參考指標</dt><dd id="summaryIndicators">尚未選擇</dd></div>
+          <div><dt>Heartbeat</dt><dd id="summaryVerbosity">Compact</dd></div>
+          <div><dt>自動執行</dt><dd id="summarySchedule">每 60 秒</dd></div>
           <div><dt>盈利目標</dt><dd id="summaryProfitTarget">3000</dd></div>
-          <div><dt>單筆止損</dt><dd id="summaryStopLoss">1000</dd></div>
-          <div><dt>每日風控</dt><dd id="summaryDailyRisk">3000</dd></div>
+          <div><dt>單筆止損</dt><dd id="summaryStopLoss">1500</dd></div>
+          <div><dt>每日風控</dt><dd id="summaryDailyRisk">2000</dd></div>
           <div><dt>角色團隊</dt><dd id="summaryAgents">尚未完成</dd></div>
         </dl>
         <div class="readiness" id="readiness">完成 7 個步驟後，會顯示 Prompt 與交易設定摘要。</div>
@@ -277,11 +330,11 @@
           </div>
 
           <div class="trade-card-preview">
-            <strong>短版交易卡</strong>
-            <span>Agent 分析：等待｜估計勝率 60%</span>
-            <span>Agent 分析：進場｜估計勝率 80%</span>
-            <span>綜合評比：勇敢進場，獲取利潤 / 等待確認 / 風險過高不進場</span>
-            <span>理由：目前抵達設定點位；若帳戶或風控資訊不清楚，先等待或要求人工確認。</span>
+            <strong>短版 Trading Action Card</strong>
+            <span>Action: WAIT</span>
+            <span>Reason: 候選不合格：confidence 61 &lt; 62</span>
+            <span>Action 只允許：多單、空單、平倉、減倉、WAIT、MANUAL</span>
+            <span>有候選 setup 時，WAIT 必須說明最短卡住原因；看不清楚或未授權時只輸出 MANUAL。</span>
           </div>
 
           <div class="result-actions">
@@ -325,15 +378,15 @@
             <section class="card decision-preview">
               <h3>風控與決策邏輯</h3>
               <div class="decision-state">
-                <strong>交易回饋卡</strong>
-                <span>最後輸出會先列 Agent 分析，再給綜合評比與理由。</span>
+                <strong>Trading Action Card</strong>
+                <span>最後輸出預設為中文短版卡片；Review 模式才展開 Agent 分析。</span>
               </div>
               <div class="state-row">
-                <span>Agent 分析：等待｜估計勝率 60%</span>
-                <span>Agent 分析：進場｜估計勝率 80%</span>
-                <span>綜合評比：勇敢進場，獲取利潤</span>
-                <span>理由：目前抵達設定點位</span>
-                <span>緊急風控：超損、超口數或掛單不匹配時，Demo / Replay 優先 Exit / Reduce</span>
+                <span>WAIT：候選不合格、等待回踩、價格太遠、方向分歧或風控阻擋</span>
+                <span>MANUAL：帳戶、商品、口數、倉位或授權不清楚</span>
+                <span>多單 / 空單：必須包含 Volume、Entry、TP、SL、Confidence、Reason</span>
+                <span>平倉 / 減倉：必須包含 Volume 與 Reason</span>
+                <span>Demo / Paper / Replay Auto 通過檢查才可執行；Live View 只分析，Live Approve 等確認。</span>
               </div>
             </section>
           </div>

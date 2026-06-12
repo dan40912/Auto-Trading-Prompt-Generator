@@ -1,93 +1,65 @@
 ---
 name: market-scan
-description: Analyze MNQ/MNQM6 market structure and technical indicators for AI trading workflows. Use when Codex needs to scan TradingView or Tradovate charts, summarize trend, inspect K candles, VWAP/MA, MACD, RSI, Volume, support/resistance, day high/low, opening price, setup_score, confidence, and trade direction before any risk or execution decision.
+description: Scan visible market structure and indicators for AI-Trading workflows. Use when Codex needs trend, support, resistance, MACD, RSI, VWAP, Volume, candle pattern, and trade-area bias without executing orders.
 ---
 
 # Market Scan
 
 ## Purpose
 
-Use this skill to read the visible chart context and produce a trade setup assessment. This skill does not authorize orders and must not click anything.
+Use this skill to scan the visible chart context. It can produce bias and candidate setups, but it must not authorize or execute orders.
 
-## Required Inputs
+## Required Scan
 
-- Platform: TradingView or Tradovate
-- Symbol: MNQ or MNQM6
-- Timeframe: Prefer 1m
-- Visible K candles
-- VWAP or MA structure
+- Main trend
+- Short-term trend
+- Support
+- Resistance
 - MACD
 - RSI
+- VWAP
 - Volume
-- Support and resistance
-- Previous high/low
-- Opening price
-- Day high/low
+- K-line pattern
+- Whether price is near a tradable area
+- Whether a retest is required
+- Whether price has broken above or below a key level
 
-If MACD, RSI, Volume, VWAP, or key prices are not visible, mark them as `not_visible`. Do not invent indicator values.
+If an indicator or level is not visible, mark it as `not_visible`. Do not invent values.
 
-## Workflow
+## Indicator Visibility
 
-1. Confirm symbol is MNQ or MNQM6.
-2. Confirm chart timeframe, preferring 1m.
-3. Identify current trend: bullish, bearish, range, chop, or unclear.
-4. Locate VWAP/MA relationship: above, below, reclaiming, rejecting, or unavailable.
-5. Read MACD state: bullish momentum, bearish momentum, weakening, crossing, or not visible.
-6. Read RSI state: strong, weak, overbought, oversold, neutral, divergent, or not visible.
-7. Read Volume: expanding, fading, climax, normal, or not visible.
-8. Mark support, resistance, opening price, previous high/low, day high/low.
-9. Produce setup_score, confidence, direction, and next trigger.
+Separate selected indicators into:
 
-## Setup Scoring
+- `selected_optional_indicators`
+- `selected_required_indicators`
 
-Use `setup_score` from 0 to 100:
+In Demo Auto, Paper Auto, and Replay Auto:
 
-- 85-100: strong trend, clean level, indicators aligned, good space.
-- 72-84: actionable if risk and authorization pass.
-- 55-71: watch only, wait for trigger.
-- Below 55: no trade.
+- MACD not visible only lowers confidence.
+- RSI not visible only lowers confidence.
+- Volume not visible only lowers confidence.
+- VWAP / MA not visible only lowers confidence.
+- News / Macro not visible should be marked `unknown` or `not_visible`.
+- Do not invent hidden data.
+- Do not output MANUAL only because optional indicators are not visible.
+- Only a missing `selected_required_indicator` may trigger MANUAL.
 
-Use `confidence` from 0 to 100:
-
-- Reduce confidence when key indicators are hidden.
-- Reduce confidence in chop, narrow range, unclear candles, or low volume.
-- Never raise confidence using assumed data.
-
-## Buy Setup
-
-A buy setup requires:
-
-- Breakout above resistance, or successful pullback to support.
-- Price above or reclaiming VWAP/opening price.
-- Upward space before next resistance.
-- MACD/RSI/Volume support when visible.
-
-If price is close but not triggered, output wait conditions. Do not recommend clicking.
-
-## Sell Setup
-
-A sell setup requires:
-
-- Breakdown below support, or failed bounce into resistance.
-- Price below or rejecting VWAP/opening price.
-- Downward space before next support.
-- MACD/RSI/Volume support when visible.
-
-If price is close but not triggered, output wait conditions. Do not recommend clicking.
-
-## Output
+## Setup Assessment
 
 Return:
 
-- trend
-- visible indicators
-- not_visible indicators
-- support
-- resistance
-- key prices
 - direction: Buy / Sell / Wait
 - setup_score
 - confidence
+- blocking_reason
 - reason
 - next_trigger
 
+Market scan can recommend bias, but final execution still requires platform safety, authorization, risk control, TP/SL, position management, and order execution checks.
+
+## Prohibited Actions
+
+- Do not click.
+- Do not authorize execution.
+- Do not override risk control.
+- Do not treat any single indicator as enough to enter.

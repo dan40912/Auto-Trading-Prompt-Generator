@@ -48,10 +48,30 @@ Add only when:
 
 - Thesis remains valid.
 - Price reaches a defined add zone.
-- Confidence is at least 68.
+- Confidence meets the current entry style add threshold.
 - Total invalidation is clear.
-- Added risk remains below the daily maximum loss.
-- Campaign size remains 6 contracts or less.
+- Added risk remains within user max single loss.
+- Campaign size remains user max qty or less.
+- RR after add remains at or above user minimum RR.
+- Position is clear.
+- Working orders are clear.
+- Environment is not unauthorized Real / Live.
+
+Add thresholds:
+
+- Aggressive add: confidence >= 65.
+- Balanced add: confidence >= 68.
+- Conservative add: confidence >= 72.
+
+Block add when:
+
+- Thesis has failed.
+- Total invalidation is broken.
+- Total contracts exceed user max qty.
+- Total risk exceeds user max single loss.
+- The add is only because the position is losing and price has not reached add zone.
+- Working orders or position are unclear.
+- Live Auto is not explicitly authorized.
 
 ## Reduce
 
@@ -70,7 +90,7 @@ Close when:
 - Price breaks the key level against the thesis.
 - Daily loss limit is threatened.
 - Trade data becomes unsafe or unclear.
-- Close/Exit control is visible and environment is Demo/Replay/Paper.
+- Close/Exit control is visible and the selected authorization mode permits the action.
 
 ## Output
 
@@ -83,4 +103,3 @@ Return:
 - add_allowed
 - reduce_close_reason
 - next_management_level
-

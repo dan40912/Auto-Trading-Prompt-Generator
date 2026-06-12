@@ -1,84 +1,90 @@
 ---
 name: order-execution
-description: Execute only permitted Demo/Replay/Paper MNQ/MNQM6 order actions after safety, authorization, risk, and setup checks pass. Use when Codex is asked to decide or perform Buy, Sell, Add, Reduce, Close, or Wait actions on Tradovate/TradeDay-style trading controls, including quantity checks and no-repeat-click safeguards.
+description: Execute only permitted AI-Trading order actions after safety, authorization, risk, market scan, and Action Card requirements pass.
 ---
 
 # Order Execution
 
 ## Purpose
 
-Use this skill only after `platform-safety`, `authorization-modes`, `market-scan`, `risk-control`, and `take-profit-stop-loss` have produced valid results.
+Use this skill only for execution. It must not do strategy analysis.
+
+## Required Preconditions
+
+Execute only when all conditions pass:
+
+- `platform-safety` passes.
+- `authorization-modes` allows execution.
+- `risk-control` passes.
+- `market-scan` has a valid signal.
+- Action Card has been produced.
+- Buy / Sell / Close button is clearly visible.
+- Qty is correct.
+- Product is correct.
+- Account is correct.
+- Working orders are not dangerous or conflicting.
+- One action maximum per heartbeat round.
+
+If any condition is unclear, output MANUAL through `heartbeat-reporting`.
+
+## Action Mapping
+
+- `多單` maps to Buy.
+- `空單` maps to Sell.
+- `平倉` maps to Close / Exit.
+- `減倉` maps to Reduce.
+- `WAIT` maps to no click.
+- `MANUAL` maps to no click.
 
 ## Non-Negotiable Rules
 
-- Never click in Real or Live mode.
 - Never click when account mode is unclear.
-- Never click if Close/Exit is not visible.
+- Never click when mode is `Live View`.
+- Never click in `Live Approve` before user confirmation.
+- Never click in `Live Auto` unless explicit Live Auto authorization exists.
+- Never click if product, qty, position, PnL, or controls are unclear.
 - Never click more than once per heartbeat round.
 - Never repeat a click when fill status is unclear.
-- Never open a new position while an existing position is open.
+- Never open a new position while an existing position is unclear.
+- Add orders must respect the 8-contract campaign maximum or the latest stricter Starter setting.
 
-## Entry Requirements
+## Working Orders
 
-For a new Buy or Sell:
+New Entry Mode requires no dangerous or conflicting working orders. It does not require absolutely zero orders.
 
-- `position = 0`
-- `execution_allowed = true`
-- `authorization_mode = demo_auto_execute`
-- `setup_score >= 72`
-- `confidence >= 68`
-- `RR >= 1.2`
-- Entry is clear.
-- `manual_stop` is clear.
-- `manual_take_profit` is clear.
-- Invalidation is clear.
+Do not block when:
 
-## Quantity Rules
+- Working orders are clearly inactive.
+- Working orders are clearly cancelled.
+- Working orders are unrelated to the current product.
+- Working orders clearly cannot affect the new trade.
+- Orders panel shows no active working order.
+- Orders panel is not visible, but the trading panel clearly shows `position = 0` and `active orders = 0` or `no working orders`.
 
-- If qty is clearly visible as 2, first entry may use 2 contracts.
-- If qty is hidden or uncertain, first entry must use 1 contract.
-- Do not double-click to create 2 contracts.
-- Add orders must respect the 6-contract campaign maximum.
+Block or require MANUAL when:
 
-## Buy Flow
+- Orders / Position / Working Orders are all unavailable and the platform may still have active orders.
+- Working orders conflict with the new direction.
+- Working order quantity is unclear.
+- Working order product is unclear.
+- Working orders may cause duplicate entry.
+- Fill status after a previous click is unclear.
 
-1. Verify no position.
-2. Confirm buy setup passed.
-3. Confirm qty.
-4. Confirm stop, take profit, RR, and invalidation.
-5. Click Buy only in Demo/Replay/Paper.
-6. Confirm fill or order status.
-7. If fill cannot be confirmed, return `required_manual_intervention=true`.
+If working orders are unclear, final output should be:
 
-## Sell Flow
-
-1. Verify no position.
-2. Confirm sell setup passed.
-3. Confirm qty.
-4. Confirm stop, take profit, RR, and invalidation.
-5. Click Sell only in Demo/Replay/Paper.
-6. Confirm fill or order status.
-7. If fill cannot be confirmed, return `required_manual_intervention=true`.
-
-## Close / Reduce Flow
-
-Close or Reduce is allowed when:
-
-- Existing position is open.
-- Close/Exit control is visible.
-- Total invalidation is hit.
-- PnL is giving back quickly.
-- Daily loss limit is threatened.
-- Risk data becomes unclear.
+```text
+Action: MANUAL
+Reason: 掛單狀態不明
+Next: 請確認 Working Orders 是否仍有效
+```
 
 ## Output
 
-Return:
+Return internal fields:
 
-- action: Wait / Buy / Sell / Add / Reduce / Close
-- clicked: true/false
+- action
+- clicked
 - qty
 - fill_confirmed
 - execution_reason
 - required_manual_intervention
-
