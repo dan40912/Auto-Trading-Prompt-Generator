@@ -3,36 +3,64 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>交易設定啟動器｜日內策略與風控設定</title>
-  <link rel="stylesheet" href="assets/css/index.css?v=seven-step-results">
+  <title>交易角色設定台｜不確定時，先停手</title>
+  <meta name="description" content="用 7 個步驟設定你的交易角色團隊。先決定什麼情況必須停手，再決定什麼情況可以執行；預設只用於模擬、紙上或回放測試。">
+  <meta name="keywords" content="交易設定, 自動交易, 紙上交易, 模擬交易, 風控, 交易角色">
+  <meta name="theme-color" content="#05070a">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="交易角色設定台｜不確定時，先停手">
+  <meta property="og:description" content="用 7 個步驟建立交易角色團隊；先設定停手規則，再設定執行條件。">
+  <meta property="og:locale" content="zh_TW">
+  <meta property="og:image" content="artifacts/landing-prompt-starter.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="交易角色設定台｜不確定時，先停手">
+  <meta name="twitter:description" content="風控優先的交易角色設定工具。看不清楚就停手，預設只用於模擬、紙上或回放測試。">
+  <meta name="twitter:image" content="artifacts/landing-prompt-starter.png">
+  <link rel="stylesheet" href="assets/css/index.css?v=ux-v7">
 </head>
 <body>
   <main class="page">
     <section class="hero">
       <div class="hero-copy">
-        <span class="eyebrow">只要Gpt帳號就可以全自動進行交易！</span>
-        <h1>AI交易設定啟動器</h1>
-        <p>顧客只需要 Codex 帳號與自己的交易平台網頁登入。選擇市場、交易風格、參考指標與風控邊界後，系統會整理成可貼進 Codex 的零安裝交易</p>
+        <span class="eyebrow">先求不錯，再求做對</span>
+        <h1>先停手<br>再交易</h1>
+        <p>交易最怕的不是錯過機會，而是在畫面、帳戶或風險還沒確認時就動手。這個設定台先幫你排好停手規則，再讓每個角色用自己的角度檢查同一筆交易。</p>
+        <ul class="hero-guards">
+          <li><b>看不清是不是模擬帳戶</b><span>→ 停手，請你確認</span></li>
+          <li><b>偵測到正式帳戶而你沒授權</b><span>→ 停手，不點任何按鈕</span></li>
+          <li><b>風控官否決</b><span>→ 停手，沒有例外</span></li>
+          <li><b>每輪最多一個動作</b><span>→ 不連續開槍</span></li>
+        </ul>
         <div class="hero-actions">
-          <a class="button primary" href="#starter" title="依照你的選項產生交易設定檔與指標顯示規格">開始設定</a>
-          <a class="button ghost" href="#starter-output" title="查看這個工具會幫你整理哪些輸出">查看輸出內容</a>
+          <a class="button primary" href="#starter" title="用 7 個步驟建立交易角色團隊">開始設定我的團隊</a>
+          <a class="button ghost" href="#flow" title="3 秒看懂這套工作流怎麼運作">它怎麼運作？</a>
         </div>
+        <p class="hero-note">3 樣東西就能開始：交易平台網頁登入、這個頁面、你的風控邊界。不需要安裝工程工具；預設環境永遠是模擬、紙上或回放測試。模擬跑得漂亮，不代表正式帳戶一定賺錢，這點必須說清楚。</p>
       </div>
+    </section>
+
+    <section class="flow" id="flow">
+      <div class="section-heading">
+        <span class="eyebrow">怎麼運作</span>
+        <h2>每一輪檢查，只走這條安全動線</h2>
+        <p>先讀畫面，再讓角色逐一檢查，風控官握有否決權，最後只留下清楚的一張行動卡。任何一步卡住，就停手。</p>
+      </div>
+      <div class="flow-diagram" id="flowDiagram"></div>
     </section>
 
     <section class="starter-output" id="starter-output">
       <div class="section-heading">
         <span class="eyebrow">輸出內容</span>
         <h2>把交易想法整理成清楚的執行規格</h2>
-        <p>顧客不需要安裝套件、clone repo 或執行腳本。完成選項後，系統會把交易偏好轉成 Codex-ready prompt，交給 orchestrator workflow 執行。</p>
+        <p>你不需要碰工程設定。完成選項後，系統會把交易偏好整理成可執行的規格，包含角色、風控、節奏與停手條件。</p>
       </div>
       <div class="output-grid">
         <article>
           <strong>1.設定你自己的交易邏輯</strong>
-          <span>固定安全檢查、授權模式、市場掃描、風控、TP/SL、部位、執行與回報順序。</span>
+          <span>固定安全檢查、授權模式、市場掃描、風控、止盈止損、部位、執行與回報順序。</span>
         </article>
         <article>
-          <strong>2. 多Agent設定，風控</strong>
+          <strong>2. 選擇角色與風控</strong>
           <span>整理畫面要顯示的買賣提示、觀察狀態、止盈止損、信心與理由。</span>
         </article>
         <article>
@@ -41,7 +69,7 @@
         </article>
         <article>
           <strong>4. 開始交易</strong>
-          <span>在右邊的瀏覽器中開啟並登入，授權ＡＩ幫你每幾分鐘執行一次．Enjoy your Trades</span>
+          <span>開啟交易平台並登入後，照你設定的節奏檢查畫面；不清楚就停，不硬做。</span>
         </article>
       </div>
     </section>
@@ -65,9 +93,14 @@
           <div>
             <span id="stepBadge">Step 1 / 7</span>
             <h2 id="stepTitle">選擇市場</h2>
-            <p id="stepHint">選擇你想要 Replay、Demo 或 Paper Trading 測試的市場。</p>
+            <p id="stepHint">選擇你想先練習或模擬測試的市場。</p>
           </div>
           <div class="progress"><span id="progressBar"></span></div>
+          <nav class="step-nav" id="stepNav" aria-label="步驟導覽"></nav>
+          <div class="wizard-meta">
+            <span id="saveHint" class="save-hint" aria-live="polite"></span>
+            <button class="link-btn" id="resetWizardBtn" type="button" title="清除已保存的設定，重新開始">重設全部</button>
+          </div>
         </header>
 
         <div class="step-panel active" data-step="0">
@@ -87,7 +120,7 @@
             <section class="team-section">
               <div class="section-label">
                 <strong>交易目標</strong>
-                <span>決定這套 workflow 最重視勝率、穩定、收益、回撤或速度。</span>
+                <span>決定這套流程最重視勝率、穩定、收益、回撤或速度。</span>
               </div>
               <div class="choice-grid" id="goalChoices"></div>
             </section>
@@ -136,8 +169,8 @@
 
               <label class="risk-field">
                 <span>單筆最大止損</span>
-                <input id="stopLossInput" type="number" min="1" step="10" value="1500" title="設定單筆交易可承受的最大虧損。若潛在止損超過此值，Risk Manager 必須阻擋。">
-                <small>預設：1500。任何 setup 超過這個止損上限都不應放行。</small>
+                <input id="stopLossInput" type="number" min="1" step="10" value="1500" title="設定單筆交易可承受的最大虧損。若潛在止損超過此值，風控主管必須阻擋。">
+                <small>預設：1500。任何候選交易超過這個止損上限都不應放行。</small>
               </label>
 
               <label class="risk-field">
@@ -148,7 +181,7 @@
 
               <label class="risk-field">
                 <span>最低盈虧比</span>
-                <input id="minimumRRInput" type="number" min="0.5" step="0.1" value="1.5" title="設定最低 Reward/Risk。低於此數字的交易不能進入最終決策。">
+                <input id="minimumRRInput" type="number" min="0.5" step="0.1" value="1.5" title="設定最低盈虧比。低於此數字的交易不能進入最終決策。">
                 <small>例：1.5。代表預期獲利至少要是風險的 1.5 倍。</small>
               </label>
 
@@ -160,7 +193,7 @@
 
               <label class="risk-field">
                 <span>加碼規則</span>
-                <select id="addOnRuleInput" title="設定是否允許加碼。保守建議先不允許加碼，等 Demo 驗證後再開啟。">
+                <select id="addOnRuleInput" title="設定是否允許加碼。保守建議先不允許加碼，等模擬驗證後再開啟。">
                   <option value="不允許加碼">不允許加碼</option>
                   <option value="只允許盈利後加碼">只允許盈利後加碼</option>
                   <option value="允許虧損後加碼攤平">允許虧損後加碼攤平</option>
@@ -171,8 +204,8 @@
 
               <label class="risk-field">
                 <span>自動執行間隔（秒）</span>
-                <input id="executionIntervalInput" type="number" min="1" step="1" value="60" title="設定 Codex 每隔幾秒執行一次交易 heartbeat。預設 60 秒。">
-                <small>預設：60 秒。使用秒為單位；數字越小，檢查越頻繁，也越耗 token。</small>
+                <input id="executionIntervalInput" type="number" min="1" step="1" value="60" title="設定每隔幾秒檢查一次交易畫面。預設 60 秒。">
+                <small>預設：60 秒。使用秒為單位；數字越小，檢查越頻繁，也越耗成本。</small>
               </label>
 
               <section class="risk-field schedule-field">
@@ -221,15 +254,15 @@
               <div>
                 <span class="eyebrow">Step 7</span>
                 <h3>建立你的交易角色團隊</h3>
-                <p>先用快速組合決定團隊骨架，再微調核心與專家角色。按下產生設定檔後，會在下方顯示 Prompt 與交易設定摘要。</p>
+                <p>先用快速組合決定團隊骨架，再像自助餐一樣挑選你需要的角色。滑過每個人影，可以看見他的工作細節。</p>
               </div>
               <span id="agentCount">0 位已選</span>
             </div>
 
             <section class="team-section">
               <div class="section-label">
-                <strong>Heartbeat Verbosity</strong>
-                <span>控制每輪 heartbeat 的輸出長度。Compact 最省 token；Review 才展開完整 Agent 分析。</span>
+                <strong>輸出長度</strong>
+                <span>控制每輪檢查後留下多少內容。精簡最短；檢查模式才展開完整角色分析。</span>
               </div>
               <div class="choice-grid compact-choice-grid" id="verbosityChoices"></div>
             </section>
@@ -264,8 +297,8 @@
               <aside class="team-builder-preview" aria-label="交易角色團隊預覽">
                 <section class="team-section">
                   <div class="section-label">
-                    <strong>團隊預覽</strong>
-                    <span>依照目前選擇即時估算。</span>
+                    <strong>購物車預覽</strong>
+                    <span>依照目前加入的角色即時估算。</span>
                   </div>
                   <div class="metric-grid">
                     <div><b id="coreCount">4</b><span>核心角色</span></div>
@@ -309,14 +342,14 @@
           <div><dt>目標</dt><dd id="summaryGoal">尚未選擇</dd></div>
           <div><dt>風格</dt><dd id="summaryStyle">尚未選擇</dd></div>
           <div><dt>參考指標</dt><dd id="summaryIndicators">尚未選擇</dd></div>
-          <div><dt>Heartbeat</dt><dd id="summaryVerbosity">Compact</dd></div>
+          <div><dt>輸出長度</dt><dd id="summaryVerbosity">精簡</dd></div>
           <div><dt>自動執行</dt><dd id="summarySchedule">每 60 秒</dd></div>
           <div><dt>盈利目標</dt><dd id="summaryProfitTarget">3000</dd></div>
           <div><dt>單筆止損</dt><dd id="summaryStopLoss">1500</dd></div>
           <div><dt>每日風控</dt><dd id="summaryDailyRisk">2000</dd></div>
           <div><dt>角色團隊</dt><dd id="summaryAgents">尚未完成</dd></div>
         </dl>
-        <div class="readiness" id="readiness">完成 7 個步驟後，會顯示 Prompt 與交易設定摘要。</div>
+        <div class="readiness" id="readiness">完成 7 個步驟後，會顯示交易設定摘要。</div>
       </aside>
     </section>
 
@@ -324,29 +357,31 @@
       <div class="results-layout">
         <section class="prompt-result-panel">
           <div class="result-panel-head">
-            <span class="eyebrow">Codex-ready</span>
-            <h2>Prompt</h2>
-            <p>先使用短版交易卡啟動 Codex workflow；需要調整或備份時，再展開完整設定檔。</p>
+            <span class="eyebrow">設定檔</span>
+            <h2>交易規格</h2>
+            <p>先使用短版行動卡啟動流程；需要調整或備份時，再展開完整設定檔。</p>
           </div>
 
           <div class="trade-card-preview">
-            <strong>短版 Trading Action Card</strong>
-            <span>Action: WAIT</span>
-            <span>Reason: 候選不合格：confidence 61 &lt; 62</span>
-            <span>Action 只允許：多單、空單、平倉、減倉、WAIT、MANUAL</span>
-            <span>有候選 setup 時，WAIT 必須說明最短卡住原因；看不清楚或未授權時只輸出 MANUAL。</span>
+            <strong>短版行動卡</strong>
+            <span>動作：等待</span>
+            <span>原因：候選不合格，信心 61 &lt; 62</span>
+            <span>動作只允許：多單、空單、平倉、減倉、等待、人工確認</span>
+            <span>有候選交易時，等待必須說明最短卡住原因；看不清楚或未授權時只要求人工確認。</span>
           </div>
 
           <div class="result-actions">
-            <button class="button ghost" id="togglePromptBtn" type="button" title="展開或收合完整交易設定檔">展開完整設定檔</button>
+            <button class="button ghost" id="copyStarterBtn" type="button" title="複製精簡快速啟動卡">複製快速啟動卡</button>
             <button class="button primary" id="copyPromptBtn" type="button" title="複製完整交易設定檔">複製設定檔</button>
-            <button class="button ghost" id="downloadPromptBtn" type="button" title="把交易設定檔下載成 Markdown 檔案保存">下載 Markdown</button>
+            <button class="button ghost" id="togglePromptBtn" type="button" title="展開或收合完整交易設定檔">展開完整設定檔</button>
+            <button class="button ghost" id="downloadPromptBtn" type="button" title="把交易設定檔下載成文字檔保存">下載設定檔</button>
+            <button class="button ghost" id="shareTeamBtn" type="button" title="把你的交易角色團隊產生成一張可分享的圖片">分享我的團隊圖</button>
           </div>
 
           <section class="prompt-panel is-collapsed" id="promptPanel">
             <div class="prompt-head">
               <h3>完整設定檔預覽</h3>
-              <span>顧客可直接貼進 Codex；不需要安裝套件或下載 repo。</span>
+              <span>可直接拿去啟動流程；不需要安裝套件或下載專案。</span>
             </div>
             <textarea id="promptOutput" spellcheck="false"></textarea>
           </section>
@@ -354,9 +389,10 @@
 
         <section class="settings-result-panel">
           <div class="result-panel-head">
-            <span class="eyebrow">Ready</span>
+            <span class="eyebrow">已建立</span>
             <h2>你的交易設定已建立</h2>
             <p>先查看摘要、角色分歧與風控邏輯。輸出已優化為短版交易卡。</p>
+            <span class="prompt-quality-badge" id="promptQualityBadge" title="設定完整度評分"></span>
           </div>
 
           <div class="result-grid">
@@ -375,18 +411,35 @@
               <div class="debate-flow" id="debateFlow"></div>
             </section>
 
+            <section class="card cost-card">
+              <h3>成本估算（誠實版）</h3>
+              <div class="cost-readout" id="costReadout"></div>
+              <p class="cost-note" id="costNote"></p>
+            </section>
+
+            <section class="card platform-card">
+              <h3>平台啟動指引</h3>
+              <div class="platform-guide" id="platformGuide"></div>
+            </section>
+
+            <section class="card recovery-card">
+              <h3>畫面看不清楚時，它會這樣保護你</h3>
+              <p class="recovery-intro">這些不是錯誤，是設計好的「停手」。每一種情況都有你的下一步。</p>
+              <div class="recovery-grid" id="recoveryGrid"></div>
+            </section>
+
             <section class="card decision-preview">
               <h3>風控與決策邏輯</h3>
               <div class="decision-state">
-                <strong>Trading Action Card</strong>
-                <span>最後輸出預設為中文短版卡片；Review 模式才展開 Agent 分析。</span>
+                <strong>行動卡</strong>
+                <span>最後輸出預設為中文短版卡片；檢查模式才展開角色分析。</span>
               </div>
               <div class="state-row">
-                <span>WAIT：候選不合格、等待回踩、價格太遠、方向分歧或風控阻擋</span>
-                <span>MANUAL：帳戶、商品、口數、倉位或授權不清楚</span>
-                <span>多單 / 空單：必須包含 Volume、Entry、TP、SL、Confidence、Reason</span>
-                <span>平倉 / 減倉：必須包含 Volume 與 Reason</span>
-                <span>Demo / Paper / Replay Auto 通過檢查才可執行；Live View 只分析，Live Approve 等確認。</span>
+                <span>等待：候選不合格、等待回踩、價格太遠、方向分歧或風控阻擋</span>
+                <span>人工確認：帳戶、商品、口數、倉位或授權不清楚</span>
+                <span>多單 / 空單：必須包含口數、進場、止盈、止損、信心與原因</span>
+                <span>平倉 / 減倉：必須包含口數與原因</span>
+                <span>模擬、紙上或回放測試通過檢查才可執行；真實帳戶預設只分析或等待確認。</span>
               </div>
             </section>
           </div>
@@ -413,15 +466,15 @@
             <div class="price-line line-blue line-top"><span>今日高</span></div>
             <div class="price-line line-white line-orl"><span>開盤低</span></div>
             <div class="price-line line-purple line-pdh"><span>前日高</span></div>
-            <div class="price-line line-green line-vwap"><span>VWAP</span></div>
+            <div class="price-line line-green line-vwap"><span>日內均價</span></div>
             <div class="price-line line-amber line-support"><span>30分支撐</span></div>
             <div class="price-line line-amber line-pressure"><span>30分壓力</span></div>
             <div class="price-line line-purple line-pdl"><span>前日低</span></div>
             <div class="price-line line-white line-orh"><span>開盤高</span></div>
             <div class="price-line line-blue line-low"><span>今日低</span></div>
-            <div class="signal-label buy-signal">買進 84% RR 1.3</div>
+            <div class="signal-label buy-signal">買進 84% 盈虧比 1.3</div>
             <div class="signal-label watch-signal">觀察壓力</div>
-            <div class="signal-label exit-signal">出多 | VWAP</div>
+            <div class="signal-label exit-signal">出多 | 均價</div>
             <div class="tp-line"><span>止盈</span></div>
             <div class="sl-line"><span>止損</span></div>
             <div class="candles" aria-hidden="true">
@@ -432,8 +485,14 @@
         </div>
       </section>
     </section>
+
+    <footer class="site-footer">
+      <span>預設模擬、紙上或回放測試 · 工具帳號不等於券商授權</span>
+      <a href="weekly-review.html" title="開啟本機交易週報：勝率、等待與人工確認比例、否決次數">交易週報（本機）</a>
+    </footer>
   </main>
 
-  <script src="assets/js/index.js?v=seven-step-results"></script>
+  <canvas id="shareCanvas" width="1200" height="630" style="display:none"></canvas>
+  <script src="assets/js/index.js?v=ux-v7"></script>
 </body>
 </html>
