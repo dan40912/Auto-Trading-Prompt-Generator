@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Trading Prompt Builder｜MNQ Strategy Automation</title>
+  <style>
+    :root {
+      --bg: #080b12;
+      --panel: rgba(255,255,255,.075);
+      --panel-2: rgba(255,255,255,.105);
+      --line: rgba(255,255,255,.14);
+      --text: #eef4ff;
+      --muted: #9ca9bd;
+      --accent: #f59e0b;
+      --accent-2: #22c55e;
+      --danger: #ef4444;
+      --blue: #38bdf8;
+      --radius: 22px;
+      --shadow: 0 24px 70px rgba(0,0,0,.42);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans TC", sans-serif;
+      background:
+        radial-gradient(circle at 10% 10%, rgba(56,189,248,.25), transparent 32%),
+        radial-gradient(circle at 88% 4%, rgba(245,158,11,.28), transparent 30%),
+        radial-gradient(circle at 50% 100%, rgba(34,197,94,.16), transparent 33%),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .shell {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 34px 20px 60px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap: 24px;
+      align-items: stretch;
+      margin-bottom: 24px;
+    }
+
+    .card {
+      background: linear-gradient(145deg, rgba(255,255,255,.115), rgba(255,255,255,.045));
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+
+    .hero-main {
+      padding: 38px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-main::after {
+      content: "";
+      position: absolute;
+      right: -90px;
+      top: -90px;
+      width: 260px;
+      height: 260px;
+      background: radial-gradient(circle, rgba(245,158,11,.38), transparent 68%);
+      pointer-events: none;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border: 1px solid rgba(245,158,11,.45);
+      border-radius: 999px;
+      color: #ffd38a;
+      background: rgba(245,158,11,.12);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    h1 {
+      margin: 20px 0 12px;
+      font-size: clamp(34px, 5vw, 64px);
+      line-height: 1.02;
+      letter-spacing: -1.8px;
+    }
+
+    .lead {
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1.75;
+      max-width: 760px;
+    }
+
+    .hero-side {
+      padding: 26px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .metric {
+      padding: 18px;
+      border-radius: 18px;
+      background: rgba(0,0,0,.23);
+      border: 1px solid rgba(255,255,255,.1);
+    }
+
+    .metric b {
+      display: block;
+      font-size: 26px;
+      margin-bottom: 6px;
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 420px 1fr;
+      gap: 24px;
+    }
+
+    .form-panel {
+      padding: 22px;
+      position: sticky;
+      top: 20px;
+      align-self: start;
+    }
+
+    .preview-panel {
+      padding: 22px;
+    }
+
+    .section-title {
+      margin: 8px 0 16px;
+      font-size: 20px;
+      letter-spacing: -.4px;
+    }
+
+    .group {
+      border-top: 1px solid var(--line);
+      padding-top: 18px;
+      margin-top: 18px;
+    }
+
+    label {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 7px;
+      font-weight: 650;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(3,7,18,.68);
+      color: var(--text);
+      border-radius: 14px;
+      padding: 12px 13px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: rgba(245,158,11,.75);
+      box-shadow: 0 0 0 4px rgba(245,158,11,.13);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .field { margin-bottom: 13px; }
+
+    .chips {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 11px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 999px;
+      cursor: pointer;
+      user-select: none;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .chip input { width: auto; accent-color: var(--accent); }
+    .chip:has(input:checked) {
+      color: var(--text);
+      border-color: rgba(245,158,11,.55);
+      background: rgba(245,158,11,.15);
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 14px;
+      padding: 12px 16px;
+      font-weight: 800;
+      cursor: pointer;
+      color: #10131b;
+      background: var(--accent);
+    }
+
+    button.secondary {
+      color: var(--text);
+      background: rgba(255,255,255,.11);
+      border: 1px solid var(--line);
+    }
+
+    button.safe {
+      background: var(--accent-2);
+    }
+
+    .prompt-box {
+      min-height: 620px;
+      resize: vertical;
+      line-height: 1.55;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 13px;
+      white-space: pre-wrap;
+    }
+
+    .notice {
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: rgba(239,68,68,.12);
+      border: 1px solid rgba(239,68,68,.32);
+      color: #fecaca;
+      line-height: 1.55;
+      margin: 14px 0;
+      font-size: 14px;
+    }
+
+    .good {
+      background: rgba(34,197,94,.10);
+      border-color: rgba(34,197,94,.34);
+      color: #bbf7d0;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .tab {
+      color: var(--muted);
+      background: rgba(255,255,255,.08);
+      border: 1px solid var(--line);
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+    }
+
+    .tab.active {
+      color: #111827;
+      background: var(--blue);
+      border-color: transparent;
+      font-weight: 800;
+    }
+
+    footer {
+      color: var(--muted);
+      text-align: center;
+      margin-top: 30px;
+      font-size: 13px;
+    }
+
+    @media (max-width: 980px) {
+      .hero, .layout { grid-template-columns: 1fr; }
+      .form-panel { position: static; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <div class="hero-main card">
+        <span class="badge">MNQ / Tradovate / TradingView / Codex Automation</span>
+        <h1>AI Trading Prompt Builder</h1>
+        <p class="lead">
+          用交易者的邏輯建立 Codex 自動化 Prompt：先定義市場狀態、時間週期、工具、風控、止盈止損、指標條件與執行頻率，再產出可直接複製的完整交易自動化指令。
+        </p>
+        <div class="notice good">
+          建議先用 Replay / Demo / Paper Trading 測試至少 100 筆以上，再考慮是否提升授權等級。Real / Live 預設禁止自動點擊。
+        </div>
+      </div>
+      <aside class="hero-side card">
+        <div class="metric"><b>Step 1</b><span>選擇文件型 / 自動化型 / 策略型 Prompt</span></div>
+        <div class="metric"><b>Step 2</b><span>設定 TradingView / Tradovate / 混合模式</span></div>
+        <div class="metric"><b>Step 3</b><span>輸出可貼進 Codex 的交易 Prompt</span></div>
+      </aside>
+    </section>
+
+    <section class="layout">
+      <form class="form-panel card" id="builderForm">
+        <h2 class="section-title">Prompt 參數設定</h2>
+
+        <div class="grid-2">
+          <div class="field">
+            <label>Prompt 類型</label>
+            <select id="promptType">
+              <option value="automation">自動化執行型</option>
+              <option value="document">文件說明型</option>
+              <option value="strategy">策略開發型</option>
+              <option value="skill">Codex Skill 拆分型</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>交易商品</label>
+            <select id="symbol">
+              <option>MNQ / MNQM6</option>
+              <option>NQ</option>
+              <option>MES / MESM6</option>
+              <option>ES</option>
+              <option>自訂商品</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="field">
+            <label>圖表工具</label>
+            <select id="chartTool">
+              <option>TradingView</option>
+              <option>Tradovate</option>
+              <option>TradingView + Tradovate</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>下單工具</label>
+            <select id="executionTool">
+              <option>Tradovate</option>
+              <option>TradeDay / Tradovate</option>
+              <option>只分析不下單</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid-3">
+          <div class="field">
+            <label>執行間隔</label>
+            <input id="intervalValue" type="number" min="1" value="15" />
+          </div>
+          <div class="field">
+            <label>單位</label>
+            <select id="intervalUnit">
+              <option value="seconds">秒</option>
+              <option value="minutes">分鐘</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>授權模式</label>
+            <select id="authMode">
+              <option>observe_only</option>
+              <option>analysis_only</option>
+              <option>confirm_required</option>
+              <option>demo_auto_manage</option>
+              <option>demo_auto_execute</option>
+              <option>live_blocked</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="group">
+          <h3 class="section-title">交易風格</h3>
+          <div class="field">
+            <label>策略類型</label>
+            <select id="strategyType">
+              <option>日內趨勢追尾</option>
+              <option>盈利追尾，只允許獲利加倉</option>
+              <option>VWAP 回歸交易</option>
+              <option>突破交易</option>
+              <option>區間支撐壓力交易</option>
+              <option>混合策略：先判斷 Trend / Range / Chop</option>
+            </select>
+          </div>
+          <div class="grid-2">
+            <div class="field">
+              <label>最大口數</label>
+              <input id="maxContracts" type="number" value="6" min="1" />
+            </div>
+            <div class="field">
+              <label>每次最多加倉</label>
+              <input id="addContracts" type="number" value="1" min="1" />
+            </div>
+          </div>
+        </div>
+
+        <div class="group">
+          <h3 class="section-title">止盈 / 止損 / 風控</h3>
+          <div class="grid-2">
+            <div class="field">
+              <label>最低 RR</label>
+              <input id="minRR" type="number" step="0.1" value="1.5" />
+            </div>
+            <div class="field">
+              <label>單筆最大風險 R</label>
+              <input id="riskR" type="number" step="0.1" value="1" />
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="field">
+              <label>日內停利</label>
+              <input id="dailyProfit" value="+5R 或 +1000 USD" />
+            </div>
+            <div class="field">
+              <label>日內停損</label>
+              <input id="dailyLoss" value="-3R 或 -1500 USD" />
+            </div>
+          </div>
+          <div class="field">
+            <label>移動止損規則</label>
+            <select id="trailingRule">
+              <option>到達 1R 後移動到 Breakeven</option>
+              <option>依照 VWAP / 新支撐 / 新壓力移動</option>
+              <option>依照盈利追尾，每次新高/新低後更新</option>
+              <option>不使用移動止損，只使用固定結構止損</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="group">
+          <h3 class="section-title">指標條件</h3>
+          <div class="chips">
+            <label class="chip"><input type="checkbox" class="indicator" value="VWAP" checked> VWAP</label>
+            <label class="chip"><input type="checkbox" class="indicator" value="MACD" checked> MACD</label>
+            <label class="chip"><input type="checkbox" class="indicator" value="RSI" checked> RSI</label>
+            <label class="chip"><input type="checkbox" class="indicator" value="Volume" checked> Volume</label>
+            <label class="chip"><input type="checkbox" class="indicator" value="EMA 9/25/200"> EMA 9/25/200</label>
+            <label class="chip"><input type="checkbox" class="indicator" value="Opening Price" checked> 開盤價</label>
+          </div>
+          <div class="grid-2" style="margin-top:13px;">
+            <div class="field">
+              <label>Buy RSI 條件</label>
+              <input id="buyRSI" value="RSI > 55 且未高於 75" />
+            </div>
+            <div class="field">
+              <label>Sell RSI 條件</label>
+              <input id="sellRSI" value="RSI < 45 且未低於 25" />
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="field">
+              <label>MACD 條件</label>
+              <select id="macdRule">
+                <option>MACD histogram 與 signal 同向</option>
+                <option>MACD 金叉 / 死叉後只做同方向</option>
+                <option>MACD 背離時禁止追價</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Volume 條件</label>
+              <select id="volumeRule">
+                <option>Volume 大於近 20 根平均 1.5 倍</option>
+                <option>Volume 大於近 20 根平均 1.2 倍</option>
+                <option>突破需要放量，回踩可縮量</option>
+                <option>不強制量能條件，但要標註可見性</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="group">
+          <h3 class="section-title">市場狀態與新聞保護</h3>
+          <div class="field">
+            <label>Market Regime</label>
+            <select id="marketRegime">
+              <option>必須先判斷 TREND / RANGE / CHOPPY</option>
+              <option>只做 Trend，不做 Range</option>
+              <option>只做 Range，不追突破</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>重大新聞保護</label>
+            <select id="newsFilter">
+              <option>重大新聞前 15 分鐘與後 10 分鐘禁止開新倉</option>
+              <option>重大新聞前後 30 分鐘禁止交易</option>
+              <option>不使用新聞保護，但需提醒風險</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button type="button" id="copyBtn">複製 Prompt</button>
+          <button type="button" class="secondary" id="resetBtn">恢復預設</button>
+        </div>
+      </form>
+
+      <section class="preview-panel card">
+        <div class="tabs">
+          <span class="tab active">Codex Prompt</span>
+          <span class="tab">Risk-first</span>
+          <span class="tab">Demo Only</span>
+          <span class="tab">Trader Logic</span>
+        </div>
+        <h2 class="section-title">產生結果</h2>
+        <div class="notice">
+          這個 Prompt 預設只允許 Demo / Replay / Paper Trading。若無法確認不是 Real / Live，必須 Wait，不得點擊。
+        </div>
+        <textarea id="promptOutput" class="prompt-box" spellcheck="false"></textarea>
+        <div class="btn-row">
+          <button class="safe" type="button" id="downloadBtn">下載 .txt</button>
+          <button class="secondary" type="button" id="selectBtn">全選文字</button>
+        </div>
+      </section>
+    </section>
+
+    <footer>
+      AI Trading Prompt Builder｜For Education, Backtesting, Replay, Demo and Paper Trading only.
+    </footer>
+  </main>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    function selectedIndicators() {
+      return [...document.querySelectorAll('.indicator:checked')].map(x => x.value).join(', ');
+    }
+
+    function buildPrompt() {
+      const interval = `${$('intervalValue').value} ${$('intervalUnit').value === 'seconds' ? '秒' : '分鐘'}`;
+      const indicators = selectedIndicators();
+
+      return `你現在是我的 AI Trading Strategy Architect + Codex Automation Engineer。
+
+請根據以下設定，建立一份可用於 Codex 的完整交易自動化 Prompt。你的目標不是盲目下單，而是建立一個「風控優先、可回測、可紀錄、可逐步優化」的交易系統。
+
+【核心設定】
+Prompt 類型：${$('promptType').value}
+交易商品：${$('symbol').value}
+圖表工具：${$('chartTool').value}
+下單工具：${$('executionTool').value}
+執行頻率：每 ${interval} 執行一次
+授權模式：${$('authMode').value}
+
+【安全與授權規則】
+1. 只允許 Demo / Replay / Paper Trading。
+2. 明確禁止 Real / Live 自動點擊。
+3. 若無法確認交易環境不是 Real / Live，decision 必須是 Wait，execution_allowed=false。
+4. 每一輪 heartbeat 最多只能執行一個動作。
+5. 若無法確認成交，不得重複點擊，必須通知人工介入。
+6. 若 Buy / Sell / Close / Exit 按鈕不可見，不得自動下單。
+
+【交易風格】
+策略類型：${$('strategyType').value}
+最大總口數：${$('maxContracts').value}
+每次最多加倉：${$('addContracts').value}
+加倉原則：優先只允許獲利加倉；若要虧損加倉，必須符合 thesis 未失效、總失效點清楚、加倉後總風險仍可控，且不得違反最大口數。
+
+【Market Regime】
+${$('marketRegime').value}
+
+請在每輪交易前先判斷市場狀態：
+- TREND：允許突破、回踩、趨勢追尾。
+- RANGE：只允許支撐買、壓力賣，不追價。
+- CHOPPY：禁止開新倉，只能等待或管理既有部位。
+
+【Higher Timeframe Filter】
+請使用 15m / 5m / 1m 三層邏輯：
+1. 15m 判斷大方向與日內偏多/偏空。
+2. 5m 判斷結構，例如 Higher High / Lower Low / 區間上下緣。
+3. 1m 只負責精準進場，不得只靠 1m 單獨下單。
+
+【指標條件】
+需要判斷的指標：${indicators}
+
+VWAP：
+- Buy 優先在價格站上 VWAP 或回踩 VWAP 成功後。
+- Sell 優先在價格跌破 VWAP 或反彈 VWAP 失敗後。
+- 若價格在 VWAP 反覆穿越，視為 CHOPPY，降低 confidence。
+
+RSI：
+- Buy RSI 條件：${$('buyRSI').value}
+- Sell RSI 條件：${$('sellRSI').value}
+- RSI 極端區不得盲目追價，需等待回踩或結構確認。
+
+MACD：
+- ${$('macdRule').value}
+- 若 MACD 與價格方向衝突，降低 setup_score。
+- 若出現背離，禁止追價或要求 Reduce。
+
+Volume：
+- ${$('volumeRule').value}
+- 突破沒有放量時，不得視為高品質突破。
+- 回踩縮量、再放量延續，才可提高 setup_score。
+
+【Setup Score 計算方式】
+請不要主觀亂給 confidence。必須依照下面規則計分：
+
+Trend Score 0-25：
+- 價格與 VWAP 同方向：10
+- 5m 結構支持方向：10
+- 15m 不反向：5
+
+Momentum Score 0-25：
+- MACD 同向：10
+- RSI 符合方向：10
+- 無明顯背離：5
+
+Volume Score 0-20：
+- 突破放量：10
+- 回踩縮量或延續放量：5
+- 量能沒有異常反向：5
+
+Structure Score 0-30：
+- 明確突破 / 跌破 / 回踩成功：15
+- entry 清楚：5
+- stop 清楚：5
+- take profit 清楚且 RR 合格：5
+
+Total setup_score = Trend + Momentum + Volume + Structure。
+只有 setup_score >= 75 才允許考慮進場。
+
+【Confidence 計算方式】
+confidence 不得憑感覺產生。
+若有交易紀錄，confidence = 過去相同 setup 的勝率。
+若沒有紀錄，confidence 上限不得超過 70。
+若指標不可見或環境不清楚，confidence 必須下降。
+只有 confidence >= 68 才允許進場。
+
+【止盈 / 止損 / 風控】
+最低 RR：${$('minRR').value}
+單筆最大風險：${$('riskR').value}R
+日內停利：${$('dailyProfit').value}
+日內停損：${$('dailyLoss').value}
+移動止損：${$('trailingRule').value}
+
+規則：
+1. 每筆交易進場前必須先定義 entry、manual_stop、manual_take_profit、RR、invalidation。
+2. Stop 必須放在結構失效點，不可只用固定點數硬套。
+3. Take Profit 必須放在前高/前低、日內高低點、VWAP 延伸區、支撐壓力或至少符合 RR 的位置。
+4. 到達 1R 後，優先保護本金。
+5. 若 PnL 快速回吐，優先 Reduce，不要等待新的理由合理化原本部位。
+
+【新聞保護】
+${$('newsFilter').value}
+
+【下單條件】
+Buy setup 必須同時符合：
+- position = 0
+- setup_score >= 75
+- confidence >= 68
+- RR >= ${$('minRR').value}
+- 價格突破壓力或回踩支撐成功
+- 價格站回 VWAP / 開盤價 / 主要均線上方
+- 上方仍有足夠空間
+- manual_stop 與 manual_take_profit 清楚
+
+Sell setup 必須同時符合：
+- position = 0
+- setup_score >= 75
+- confidence >= 68
+- RR >= ${$('minRR').value}
+- 價格跌破支撐或反彈壓力失敗
+- 價格跌回 VWAP / 開盤價 / 主要均線下方
+- 下方仍有足夠空間
+- manual_stop 與 manual_take_profit 清楚
+
+【有部位時】
+只能做 Hold / Add / Reduce / Close。
+不得開反向新倉。
+若觸及 total invalidation，優先 Close 或 Reduce。
+若達到 1R，優先保護本金。
+若市場從 TREND 轉成 CHOPPY，降低持倉信心。
+若 Volume 衰退且 PnL 回吐，優先 Reduce。
+
+【交易紀錄要求】
+每次動作後都要記錄：
+- Date / Time
+- Symbol
+- Direction
+- Entry
+- Stop
+- Take Profit
+- RR
+- Market Regime
+- VWAP 狀態
+- RSI
+- MACD
+- Volume
+- setup_score
+- confidence
+- Result
+- R multiple
+- 進場理由
+- 出場理由
+
+【輸出格式】
+請輸出 heartbeat XML，不要輸出 JSON。
+每輪必須包含：
+- decision
+- execution_allowed
+- authorization_mode
+- market_regime
+- trend
+- setup_score
+- confidence
+- RR
+- entry
+- manual_stop
+- manual_take_profit
+- invalidation
+- current_position
+- open_PnL
+- daily_PnL
+- action
+- reason
+- next_step
+
+若有 Buy / Sell / Add / Reduce / Close，必須 NOTIFY。
+若只是觀察，使用 DONT_NOTIFY，但 message 必須清楚說明：
+目前趨勢、MACD、RSI、Volume、VWAP、我會做什麼、預測勝率、理由、關鍵價位、下一步。
+
+最後請把整份 Prompt 寫成可以直接貼進 Codex 的版本。`;
+    }
+
+    function refresh() {
+      $('promptOutput').value = buildPrompt();
+    }
+
+    document.querySelectorAll('input, select').forEach(el => el.addEventListener('input', refresh));
+    document.querySelectorAll('input[type=checkbox]').forEach(el => el.addEventListener('change', refresh));
+
+    $('copyBtn').addEventListener('click', async () => {
+      await navigator.clipboard.writeText($('promptOutput').value);
+      $('copyBtn').textContent = '已複製';
+      setTimeout(() => $('copyBtn').textContent = '複製 Prompt', 1200);
+    });
+
+    $('selectBtn').addEventListener('click', () => {
+      $('promptOutput').focus();
+      $('promptOutput').select();
+    });
+
+    $('downloadBtn').addEventListener('click', () => {
+      const blob = new Blob([$('promptOutput').value], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'codex-ai-trading-prompt.txt';
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    $('resetBtn').addEventListener('click', () => location.reload());
+
+    refresh();
+  </script>
+</body>
+</html>
